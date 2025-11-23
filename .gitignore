@@ -1,0 +1,9 @@
+*.csproj
+*.sln
+.vs/
+Library/
+Logs/
+obj/
+Temp/
+*.gguf
+*.gguf.meta
