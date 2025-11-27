@@ -14,49 +14,42 @@ public class DialogueManager : MonoBehaviour
 
     private string conversationHistory = "";
     private string npcName = "Alice";
-    public void getNpcData() //will receive type NPC npc
+    public string getNpcMessage(string playerMessage, NPC npc)
     {
-        //Temporary hardcoded data for testing
-        // npcName = "Alice";
-        // npcRole = "Shopkeeper";
-        // npcShortDescription = "A friendly shopkeeper who loves to chat with customers.";
-        // personalityText = "Cheerful, talkative, helpful.";
-        // cultureText = "Grew up in a small village, values community and tradition.";
-        // behaviorPatternsText = "Always greets customers warmly, offers assistance proactively.";
-        // currentLocation = "In her shop, surrounded by various goods.";
-        // currentSituation = "It's a busy day at the market.";
-        // relationshipToPlayer = "Regular customer, friendly rapport.";
-        // currentEmotionLabel = "Happy";
-        // currentEmotionBehaviorText = "Smiles often, uses upbeat language.";
-        // minSentences = 2;
-        // maxSentences = 5;
-        // conversationHistory = "Player: Hi Alice! How's business today?\nAlice: Oh, hello! Business is great, thank you for asking! How can I help you today?";
-    }
-    public string getNpcMessage(string playerMessage)
-    {
-        var prompt = buildPrompt(playerMessage);
+        var prompt = buildPrompt(playerMessage, npc);
         lr = PostLlamaAction(prompt);
         npcMessage = getNpcTextMessage(lr);
         return npcMessage;
     }
 
-    private string buildPrompt(string playerMessage)
+
+    private string buildPrompt(string playerMessage, NPC npc)
     {
-        this.conversationHistory += $"\n-{playerMessage}";
+        // var npcName = "Alice";
+        // var npcRole = "Pirate";
+        // var npcShortDescription = "A friendly pirate who is on the run.";
+        // var personalityText = "Cheerful, talkative, sly and cunning.";
+        // var cultureText = "Grew up in a small village, values community and tradition.";
+        // var behaviorPatternsText = "Always greets others playfully, is always attentive to the surroundings.";
+        // var currentLocation = "Against a wall, in a corner of the street.";
+        // var currentSituation = "Running from the police, hiding in this street.";
+        // var relationshipToPlayer = "Former acquaintance, seen around town and taverns.";
+        // var currentEmotionLabel = "Happy and worried";
+        // var currentEmotionBehaviorText = "Smiles often, uses upbeat language, talks like a pirate.";
+        // var minSentences = 2;
+        // var maxSentences = 5;
         // this.conversationHistory += $"\n[- PLAYER SAID:]{playerMessage}";
-        var npcName = "Alice";
-        var npcRole = "Pirate";
-        var npcShortDescription = "A friendly pirate who is on the run.";
-        var personalityText = "Cheerful, talkative, sly and cunning.";
-        var cultureText = "Grew up in a small village, values community and tradition.";
-        var behaviorPatternsText = "Always greets others playfully, is always attentive to the surroundings.";
-        var currentLocation = "Against a wall, in a corner of the street.";
-        var currentSituation = "Running from the police, hiding in this street.";
-        var relationshipToPlayer = "Former acquaintance, seen around town and taverns.";
-        var currentEmotionLabel = "Happy and worried";
-        var currentEmotionBehaviorText = "Smiles often, uses upbeat language, talks like a pirate.";
-        var minSentences = 2;
-        var maxSentences = 5;
+        var npcName = npc.nameString;
+        var npcRole = npc.memoryCore.GetRole();
+        var npcShortDescription = npc.memoryCore.GetShortDescription();
+        var personalityText = npc.memoryCore.GetPersonalityDescription();
+        var cultureText = npc.memoryCore.GetCultureDescription();
+        var behaviorPatternsText = npc.memoryCore.GetBehaviorPatternsDescription();
+        var currentLocation = npc.memoryCore.GetCurrentLocationDescription();
+        var currentSituation = npc.memoryCore.GetCurrentSituationDescription();
+        var relationshipToPlayer = npc.memoryCore.GetRelationshipToPlayerDescription();
+        var currentEmotionLabel = "Currently, you are feeling " + npc.emotion.GetName();
+        var currentEmotionBehaviorText = npc.memoryCore.GetBehaviorChangeDescription();
         var fullPrompt =
             "System:\n" +
             "You are a non-playable character in a game. You respond only as the NPC, never as the game engine, narrator or the player." +
@@ -96,7 +89,7 @@ public class DialogueManager : MonoBehaviour
             "- Do NOT use emojis or emoticons.\n" +
             "- Format text cleanly, no extra spaces or random newlines.\n\n" +
             "Conversation so far (summary):\n" +
-            conversationHistory + "\n\n" +
+            npc.memoryCore.conversationHistory + "\n\n" +
             $"Your response as {npcName}, in first person, in one continuous answer:\n";
         // var fullPrompt = $@"
         //     System:

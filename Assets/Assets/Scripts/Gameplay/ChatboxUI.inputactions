@@ -1,0 +1,66 @@
+{
+    "version": 1,
+    "name": "ChatboxUI",
+    "maps": [
+        {
+            "name": "ChatboxUI",
+            "id": "41c210d0-26d9-48ac-b595-99e249b4e663",
+            "actions": [
+                {
+                    "name": "CloseChat",
+                    "type": "Button",
+                    "id": "fc0ad060-80b5-46b9-8bbd-08c82add2163",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SendMessage",
+                    "type": "Button",
+                    "id": "cf905480-3ac5-4c00-a146-b2789c82ba4b",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "447581f6-79fd-4807-837a-576ce8995e23",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CloseChat",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "63829098-13d3-46cf-8c5e-2d1a52dd173a",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SendMessage",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "32998c00-ce43-45ac-b168-4f7ec6b5dc00",
+                    "path": "<Keyboard>/numpadEnter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SendMessage",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

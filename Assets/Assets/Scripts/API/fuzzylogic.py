@@ -130,7 +130,7 @@ def getEmotion():
 
 def calculateResultEmotion(emotion):
     for i in range(len(emotion)):
-        emotion[i] = emotion[i]*100 #adjust emotion axes values as percentages for membership functions
+        emotion[i] = emotion[i]*100 # adjust emotion axes values as percentages for membership functions
     
     response_emotion = []
     membership_values = []

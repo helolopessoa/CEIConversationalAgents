@@ -10,12 +10,16 @@ public class ChatLogMessage : MonoBehaviour
     [SerializeField] private TMP_InputField userInput;
     [SerializeField] private TMP_Text npcMessageOutput;
     [SerializeField] private Button sendButton;
-    [SerializeField] private ChatMessage chatMessageController;
-
+    private ChatController npcChatMessageController;
+    public void Init(ChatController controller)
+    {
+        npcChatMessageController = controller;
+    }
+    
     void Start()
     {
         // if (chatMessageController != null) chatMessageController.onSendMessage.AddListener(UpdateNpcMessage);
-        if (npcMessageOutput != null) npcMessageOutput.text = chatMessageController.npcMessage;
+        if (npcMessageOutput != null) npcMessageOutput.text = npcChatMessageController.npcMessage;
         if (sendButton != null) sendButton.onClick.AddListener(SubmitSendButton);
         if (userInput != null && userInput.isFocused)
         {
@@ -23,18 +27,17 @@ public class ChatLogMessage : MonoBehaviour
             userInput.ActivateInputField();
         }
     }
-    
     public void SubmitUserMessage(string userMessage)
     {
         if (string.IsNullOrWhiteSpace(userMessage)) return;   
 
         // Debug.Log($"[PLAYER] {userMessage}");
-        chatMessageController.onSendMessage(userMessage);
+        npcChatMessageController.onSendMessage(userMessage);
         userInput.text = string.Empty;
         userInput.ActivateInputField();
     }
 
-    private void SubmitSendButton()
+    public void SubmitSendButton()
     {
         if (userInput == null) return;
         SubmitUserMessage(userInput.text);
@@ -42,8 +45,9 @@ public class ChatLogMessage : MonoBehaviour
 
     public void UpdateNpcMessage()
     {
-        // Debug.Log($"[ChatLogMessage] {chatMessageController.npcMessage}");
-        if (npcMessageOutput != null) npcMessageOutput.text = chatMessageController.npcMessage;
+        if(npcChatMessageController == null) return;
+        Debug.Log($"[ChatLogMessage] {npcChatMessageController.npcMessage}");
+        if (npcMessageOutput != null) npcMessageOutput.text = npcChatMessageController.npcMessage;
     }
 
 
