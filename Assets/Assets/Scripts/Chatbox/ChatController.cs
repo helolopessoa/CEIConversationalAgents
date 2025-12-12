@@ -124,10 +124,10 @@ void Awake()
             chatCanvas.SetActive(false);
     }
 
-    public void onSendMessage(string playerMessage)
+    public void onSendMessage(string userMessage)
     {
-        npc.memoryCore.conversationHistory += $"\n-{playerMessage}";
-        npcMessage = dm.getNpcMessage(playerMessage, npc);
+        npc.memoryCore.conversationHistory += $"\n-{userMessage}";
+        npcMessage = dm.getNpcMessage(userMessage, npc);
         npc.memoryCore.conversationHistory += $"\n-{npcMessage}";
         chatLog?.UpdateNpcMessage();
     }

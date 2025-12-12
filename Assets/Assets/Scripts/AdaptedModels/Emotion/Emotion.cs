@@ -133,9 +133,9 @@ public class Emotion {
     public string GetMentalStateName()
     {
         Dictionary<string, string> mentalStates = AllEmotions.GetMentalState();
-        string name = GetFuzzyEmotion();
         // string name = GetFuzzyEmotion();
-        return mentalStates[name];
+        // string name = GetFuzzyEmotion();
+        return mentalStates[GetName()];
     }
 
 
@@ -161,14 +161,14 @@ public class Emotion {
         }
     }
 
-    public string GetFuzzyEmotion()
-    {
-        FuzzyResponse fr = FuzzyAPI.getFuzzyEmotionalResponse();
-        return fr.emotion;
-    }
+    // public string GetFuzzyEmotion()
+    // {
+    //     FuzzyResponse fr = FuzzyAPI.GetFuzzyEmotionalResponse();
+    //     return fr.emotion;
+    // }
 
-    public void PostFuzzyEmotion()
-    {
-        FuzzyAPI.postFuzzyEmotionalInput(currentEmotion);
-    }
+    // public void PostFuzzyEmotion()
+    // {
+    //     FuzzyAPI.PostFuzzyEmotionalInput(currentEmotion);
+    // }
 }

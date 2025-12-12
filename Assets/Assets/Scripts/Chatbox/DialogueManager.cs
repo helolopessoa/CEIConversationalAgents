@@ -164,8 +164,16 @@ public class DialogueManager : MonoBehaviour
     }
 
 
-    public LlamaResponse PostLlamaAction(string message)
+    public LlamaResponse PostLlamaAction(string prompt)
     {
-        return LlamaAPI.postLlamaAction(message);
+        LlamaResponse resp = null;
+        StartCoroutine(LlamaAPI.PostLlamaAction(prompt, (response) =>
+            {
+                if (response != null)
+                    resp = response;
+                else
+                    Debug.LogError("Llama API returned null response.");
+            }));
+        yield return resp;
     }
 }

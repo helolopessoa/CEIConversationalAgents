@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using UnityEngine;
-using System.Net;
+// using System.Net;
 using System.IO;
 using System;
+using UnityEngine.Networking;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -12,30 +13,59 @@ public static class LlamaAPI
     private static string apiLlamaURL = apiURL + "/llamaapi";
 
 
-public static LlamaResponse postLlamaAction(string prompt)
+// public static LlamaResponse postLlamaAction(string prompt)
+// {
+//     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(apiLlamaURL);
+//     request.Method = "POST";
+//     request.ContentType = "application/json";
+//     // var prompt = "Write a contextual answer to the following, returning ONLY it's words:'" + message + "', with the following emotional bias:'" + emotion + "', while pretending you're:" + name;
+//     // var postData = "{\"prompt\": \"" + prompt + "\"}";
+//     var body = new {prompt = prompt};
+
+//     string postData = JsonConvert.SerializeObject(body);
+
+//     byte[] byteArray = Encoding.UTF8.GetBytes(postData);
+
+//     using (var stream = request.GetRequestStream())
+//     {
+//         stream.Write(byteArray, 0, byteArray.Length);
+//     }
+
+//     using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+//     using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+//     {
+//         string responseString = reader.ReadToEnd();
+//         // Debug.Log("Llama response: " + responseString);
+//         return JsonUtility.FromJson<LlamaResponse>(responseString);
+//     }
+// }
+
+public static IEnumerator PostLlamaAction(string prompt, Action<LlamaResponse> callback)
 {
-    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(apiLlamaURL);
-    request.Method = "POST";
-    request.ContentType = "application/json";
-    // var prompt = "Write a contextual answer to the following, returning ONLY it's words:'" + message + "', with the following emotional bias:'" + emotion + "', while pretending you're:" + name;
-    // var postData = "{\"prompt\": \"" + prompt + "\"}";
-    var body = new {prompt = prompt};
+    string url = apiLlamaURL;
 
-    string postData = JsonConvert.SerializeObject(body);
+    var body = new { prompt = prompt };
+    string json = JsonConvert.SerializeObject(body);
 
-    byte[] byteArray = Encoding.UTF8.GetBytes(postData);
+    UnityWebRequest www = new UnityWebRequest(url, "POST");
+    byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+    www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+    www.downloadHandler = new DownloadHandlerBuffer();
+    www.SetRequestHeader("Content-Type", "application/json");
+    www.timeout = 30;  // aumenta o timeout
 
-    using (var stream = request.GetRequestStream())
+    yield return www.SendWebRequest();
+
+    if (www.result != UnityWebRequest.Result.Success)
     {
-        stream.Write(byteArray, 0, byteArray.Length);
+        Debug.LogError("Error calling LLama: " + www.error);
+        callback(null);
     }
-
-    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-    using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+    else
     {
-        string responseString = reader.ReadToEnd();
-        // Debug.Log("Llama response: " + responseString);
-        return JsonUtility.FromJson<LlamaResponse>(responseString);
+        string jsonResponse = www.downloadHandler.text;
+        LlamaResponse response = JsonUtility.FromJson<LlamaResponse>(jsonResponse);
+        callback(response);
     }
 }
 

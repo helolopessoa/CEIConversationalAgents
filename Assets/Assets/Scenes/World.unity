@@ -1157,6 +1157,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController2D
   moveSpeed: 5
   playerInputAsset: {fileID: -944628639613478452, guid: 203cb1b3f7b771f4e9731bba6f5aeb4e, type: 3}
+  chatInputAsset: {fileID: -944628639613478452, guid: 0968373cccd80db4eaa62d7665750a8f, type: 3}
 --- !u!50 &649374320
 Rigidbody2D:
   serializedVersion: 5
@@ -1877,9 +1878,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1136379761}
   - component: {fileID: 1136379762}
-  - component: {fileID: 1136379763}
   - component: {fileID: 1136379764}
   - component: {fileID: 1136379765}
+  - component: {fileID: 1136379763}
   m_Layer: 0
   m_Name: NPC (1)
   m_TagString: Untagged
@@ -1964,6 +1965,7 @@ MonoBehaviour:
   npcMessage: Hello, I'm Alice.
   dm: {fileID: 453033159}
   chatLog: {fileID: 453033158}
+  chatInputAsset: {fileID: -944628639613478452, guid: 0968373cccd80db4eaa62d7665750a8f, type: 3}
   chatCanvas: {fileID: 1280791000}
   player: {fileID: 649374319}
 --- !u!114 &1136379764
@@ -1997,17 +1999,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCMemoryCore
   npcName: Alice
-  npcRole: Pirate
-  npcShortDescription: A friendly pirate who is on the run.
-  personalityText: Cheerful, talkative, sly and cunning.
-  cultureText: Grew up in a small village, values community and tradition.
+  npcRole: Leader of the Rangers
+  npcShortDescription: A fierce female leader of the Ranger's cyberpunk tribe, that's
+    currently in war against the downsiders
+  personalityText: Cheerful, talkative, sly and cunning. Determined upon her beliefs.
+  cultureText: Is always rushing and wanting things to be quickly done. Cares terribly
+    about her fellow peers and is very worried about others. Cares somewhat about
+    money, but not much. Is slightly concerned about honor and dinity. Tends to be
+    polite and appreciate those who returns the favor, but doesnt mind much a more
+    upfront approach. Doesn't let her feeling get the best fo her.
   behaviorPatternsText: Always greets others playfully, is always attentive to the
     surroundings.
   currentLocation: Against a wall, in a corner of the street.
-  currentSituation: Running from the police, hiding in this street.
-  relationshipToPlayer: Former acquaintance, seen around town and taverns.
+  currentSituation: Worried about her  people, against a peace treat over the war
+    with the Downsiders.
+  relationshipToPlayer: Player is an outsider, but not an enemy. She knows the player
+    got sent here to try and bring peace between the two groups.
   currentEmotionLabel: Happy and worried.
-  currentEmotionBehaviorText: Smiles often, uses upbeat language, talks like a pirate.
+  currentEmotionBehaviorText: Smiles often, uses upbeat and formal language.
   npcMessage: 
   conversationHistory: 
 --- !u!1 &1280653301
@@ -2637,9 +2646,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1601106831}
   - component: {fileID: 1601106835}
-  - component: {fileID: 1601106834}
   - component: {fileID: 1601106833}
   - component: {fileID: 1601106832}
+  - component: {fileID: 1601106834}
   m_Layer: 0
   m_Name: NPC (2)
   m_TagString: Untagged
@@ -2676,17 +2685,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCMemoryCore
   npcName: Roxanne
-  npcRole: Pirate
-  npcShortDescription: A friendly pirate who is on the run.
-  personalityText: Serious, shy, sly and cunning.
-  cultureText: Grew up in a small village, values community and tradition.
-  behaviorPatternsText: Always greets others playfully, is always attentive to the
-    surroundings.
+  npcRole: Leader of the Downsiders.
+  npcShortDescription: A fierce female leader of the Ranger's cyberpunk tribe, that's
+    currently in war against the downsiders
+  personalityText: Serious, shy, sly and cunning. Tends to be insecure on her decisions.
+  cultureText: Is very  patient and cares little for rushing things. Isn't truly
+    worried about the consequences of her decisions upon fellow peers. Cares a lot
+    about money. Does not care about honor and dignity. Is highly impolite and appreciate
+    those who take a more upfront approach. It's very sentimental, and tends to let
+    her emotions dominate her.
+  behaviorPatternsText: Always greets others dismissively, is always attentive to
+    the surroundings, paranoid.
   currentLocation: Against a wall, in a corner of the street.
-  currentSituation: Running from the police, hiding in this street.
-  relationshipToPlayer: Former acquaintance, seen around town and taverns.
+  currentSituation: Worried about her  people, against a peace treat over the war
+    with the Rangers.
+  relationshipToPlayer: Player is an outsider, but not an enemy. She knows the player
+    got sent here to try and bring peace between the two groups.
   currentEmotionLabel: Grumpy and worried.
-  currentEmotionBehaviorText: Smiles often, uses upbeat language, talks like a pirate.
+  currentEmotionBehaviorText: Worried, uses street jargon.
   npcMessage: 
   conversationHistory: 
 --- !u!114 &1601106833
@@ -2722,6 +2738,7 @@ MonoBehaviour:
   npcMessage: Hello, I'm Alice.
   dm: {fileID: 453033159}
   chatLog: {fileID: 453033158}
+  chatInputAsset: {fileID: -944628639613478452, guid: 0968373cccd80db4eaa62d7665750a8f, type: 3}
   chatCanvas: {fileID: 1280791000}
   player: {fileID: 649374319}
 --- !u!61 &1601106835
@@ -3394,7 +3411,7 @@ GameObject:
   - component: {fileID: 2070965445}
   - component: {fileID: 2070965446}
   m_Layer: 0
-  m_Name: character_15_full
+  m_Name: character_9_full
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
