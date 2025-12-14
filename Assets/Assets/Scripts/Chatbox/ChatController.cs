@@ -9,16 +9,18 @@ public class ChatController : MonoBehaviour
 
     [HideInInspector]
     public string npcMessage;
+    // public string userMessage;
+    
     [SerializeField]
     private DialogueManager dm;
 
     [SerializeField]
     private ChatLogMessage chatLog;
+    
     public InputActionAsset chatInputAsset; // ChatUIBox asset
-    // private InputAction closeChatAction;
     private InputAction sendChatAction;
-
     private NPC npc;
+    
     [Header("UI")]
     public GameObject chatCanvas;          // canvas to show for this NPC
 
@@ -37,6 +39,13 @@ void Awake()
 
     private void Start()
     {
+        // StartCoroutine(LlamaAPI.TestPing((resp) =>
+        // {
+        //     if (resp == null)
+        //         Debug.LogError("Ping failed.");
+        //     else
+        //         Debug.Log("Ping succeeded. Server replied: " + resp);
+        // }));
         Debug.Log("[ChatController] Starting ChatController for NPC: " + npc);
         npcMessage = npc.memoryCore.npcMessage;
         chatLog?.UpdateNpcMessage();
@@ -48,16 +57,12 @@ void Awake()
         // enable chat UI actions (elas podem ficar sempre ligadas;
         // a gente só reage se o chat estiver aberto)
         sendChatAction.Enable();
-        // closeChatAction.Enable();
         sendChatAction.performed  += OnSendChat;
-        // closeChatAction.performed += OnCloseChat;
     }
     private void OnDisable()
     {
         sendChatAction.performed  -= OnSendChat;
-        // closeChatAction.performed -= OnCloseChat;
         sendChatAction.Disable();
-        // closeChatAction.Disable();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -89,16 +94,6 @@ void Awake()
         if (!ctx.performed) return;
         if (player != null && player.canMove == true) return;          // não está com chat aberto
         if (chatLog == null) return;
-
-        // string text = chatInputField.text;
-        // if (string.IsNullOrWhiteSpace(text)) return;
-
-        // manda a mensagem pro NPC
-        // currentChatZone.onSendMessage(text);
-
-        // limpa input e mantém foco
-        // chatInputField.text = string.Empty;
-        // chatInputField.ActivateInputField();
         chatLog.SubmitSendButton();
     }
 
@@ -110,10 +105,6 @@ void Awake()
         if (chatCanvas != null)
             chatCanvas.SetActive(true);
             chatLog.Init(this);
-
-        // Now the EventSystem’s DefaultInputActions (UI map) takes over:
-        // - Enter = Submit
-        // - Arrows / Tab = Navigate
     }
 
     public void CloseChat()
@@ -124,14 +115,45 @@ void Awake()
             chatCanvas.SetActive(false);
     }
 
+    // public void onSendMessage(string userMessage)
+    // {
+    //     npc.memoryCore.conversationHistory += $"\n-{userMessage}";
+    //     npcMessage = dm.getNpcMessage(userMessage, npc);
+    //     npc.memoryCore.conversationHistory += $"\n-{npcMessage}";
+    //     chatLog?.UpdateNpcMessage();
+    // }
+
     public void onSendMessage(string userMessage)
     {
         npc.memoryCore.conversationHistory += $"\n-{userMessage}";
-        npcMessage = dm.getNpcMessage(userMessage, npc);
-        npc.memoryCore.conversationHistory += $"\n-{npcMessage}";
-        chatLog?.UpdateNpcMessage();
+        // 1) show player line immediately
+        // chatLog?.UpdateNpcMessage(userMessage);
+
+        // 2) build prompt
+        string prompt = dm.BuildPrompt(userMessage, npc);
+
+        // 3) call LLaMA asynchronously
+        StartCoroutine(CallLlamaAndShowReply(prompt, userMessage));
     }
 
+    private IEnumerator CallLlamaAndShowReply(string prompt, string playerMessage)
+    {
+        LlamaResponse lr = null;
+        yield return LlamaAPI.PostLlamaAction(prompt, (resp) => lr = resp);
 
+        if (lr == null)
+        {
+            npcMessage = "[Erro] Falha na LLaMA.";
+            chatLog?.UpdateNpcMessage();
+            yield break;
+        }
 
+        npcMessage = dm.GetNpcTextMessage(lr);
+        npc.memoryCore.conversationHistory += $"\n-{npcMessage}";
+        // chatLog.AddNpcMessage(npcText);
+        chatLog?.UpdateNpcMessage();
+    }
 }
+
+
+

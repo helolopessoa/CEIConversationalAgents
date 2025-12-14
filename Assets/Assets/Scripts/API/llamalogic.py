@@ -47,19 +47,7 @@ llm = Llama(MODEL_PATH,
             n_gpu_layers=max_gpu_layers,
             verbose=False,)
 
-def generateResponse(full_prompt: str, max_new_tokens: int = 120) -> str:
-
-    # response = llm(
-    #     full_prompt,
-    #     max_new_tokens=max_new_tokens,
-    #     temperature=0.8,
-    #     top_p=0.9,
-    #     top_k=40,
-    #     repetition_penalty=1.15,
-    #     presence_penalty=0.1,
-    #     frequency_penalty=0.1,
-    #     stop=["User:", "System:", "Assistant:"]
-    # )
+def generateResponse(full_prompt: str, max_new_tokens: int = 60) -> str:
     output = llm(
         full_prompt,
         max_tokens=max_new_tokens,

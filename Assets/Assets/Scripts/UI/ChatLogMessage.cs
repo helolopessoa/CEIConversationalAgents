@@ -50,5 +50,12 @@ public class ChatLogMessage : MonoBehaviour
         if (npcMessageOutput != null) npcMessageOutput.text = npcChatMessageController.npcMessage;
     }
 
+    // public void UpdatePlayerMessage(string userMessage)
+    // {
+    //     if(npcChatMessageController == null) return;
+    //     Debug.Log($"[ChatLogMessage] {userMessage}");
+    //     if (userMessage != null) npcMessageOutput.text = userMessage;
+    // }
+
 
 }

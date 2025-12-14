@@ -17,7 +17,7 @@ public static class FuzzyAPI
     {
         using (UnityWebRequest www = UnityWebRequest.Get(apiFuzzyURL))
         {
-            www.timeout = 10; // seconds, adjust if needed
+            www.timeout = 10;
 
             yield return www.SendWebRequest();
 
@@ -51,7 +51,6 @@ public static class FuzzyAPI
 
         string[] emotionKeys = { "axeAF", "axeDT", "axeSJ", "axeAS" };
 
-        // Build form (same as application/x-www-form-urlencoded)
         WWWForm form = new WWWForm();
         for (int i = 0; i < 4; i++)
         {

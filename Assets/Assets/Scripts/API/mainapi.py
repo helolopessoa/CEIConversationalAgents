@@ -44,5 +44,13 @@ def generate():
     return jsonify(output)
 ##############################
 
+@app.route("/ping", methods=["GET"])
+def ping():
+    print("[FLASK] /ping called")
+    return {"status": "ok"}
+
+
 if __name__ == "__main__":
     app.run(port=11434)
+
+    

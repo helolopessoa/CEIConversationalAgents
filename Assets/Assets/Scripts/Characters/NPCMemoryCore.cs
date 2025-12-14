@@ -5,7 +5,6 @@ using TMPro;
 
 public class NPCMemoryCore : MonoBehaviour
 {
-
     [Header("Default values (editable in Inspector)")]
     public string npcName;
     public string npcRole;
@@ -21,6 +20,7 @@ public class NPCMemoryCore : MonoBehaviour
     [HideInInspector]
     public string npcMessage;
     public string conversationHistory;
+    private NPC npc;
 
     // public string role = "Citizen";
     // public string shortDescription = "A helpful NPC.";
@@ -35,6 +35,8 @@ public class NPCMemoryCore : MonoBehaviour
 
     void Awake()
     {
+        npc = GetComponent<NPC>();
+        Debug.Log("NPC Found " + npc == null ? "null" : npc.name);
         npcMessage = $"Hello, I'm {npcName}.";
     }
     //     // Make sure we have a memoryCore: try to find one on the same GameObject, otherwise add a default.
@@ -73,13 +75,13 @@ public class NPCMemoryCore : MonoBehaviour
     //     currentEmotionBehaviorText = emotion.GetBehaviorChangeDescription();
     // }
 
-    public string GetRole() => npcRole;
+    public string GetRole() => npcRole; //--> fixed value
     public string GetShortDescription() => npcShortDescription;
-    public string GetPersonalityDescription() => personalityText;
-    public string GetCultureDescription() => cultureText;
+    public string GetPersonalityDescription() => personalityText; //--> npc get
+    public string GetCultureDescription() => cultureText; //--> npc get
     public string GetBehaviorPatternsDescription() => behaviorPatternsText;
-    public string GetBehaviorChangeDescription() => currentEmotionBehaviorText;
-    public string GetCurrentLocationDescription() => currentLocation;
-    public string GetCurrentSituationDescription() => currentSituation;
-    public string GetRelationshipToPlayerDescription() => relationshipToPlayer;
+    public string GetBehaviorChangeDescription() => currentEmotionBehaviorText; //--> npc get
+    public string GetCurrentLocationDescription() => currentLocation; //--> fixed value
+    public string GetCurrentSituationDescription() => currentSituation; //--> alters with conversation history
+    public string GetRelationshipToPlayerDescription() => relationshipToPlayer; //--> alters with conversation history
 }

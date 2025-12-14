@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Numerics;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,36 +10,32 @@ public class DialogueManager : MonoBehaviour
 {
 
     [HideInInspector]
-    public string npcMessage = "Hello, I'm Alice.";
-    private LlamaResponse lr;
-
     private string conversationHistory = "";
     private string npcName = "Alice";
-    public string getNpcMessage(string playerMessage, NPC npc)
+    private string allEmotionsText = "";
+
+    public void Start()
     {
-        var prompt = buildPrompt(playerMessage, npc);
-        lr = PostLlamaAction(prompt);
-        npcMessage = getNpcTextMessage(lr);
-        return npcMessage;
+        var dict = ActionEmotions.GetDict();
+        List<string> allEmotionsLines = new List<string>();
+        string[] possibleActions = dict.Keys.ToArray();
+        int i = 1;
+        foreach (string action in possibleActions)
+        {
+            if (!dict.ContainsKey(action)) continue;
+
+            string emotions = string.Join(", ", dict[action]);
+            allEmotionsLines.Add($"Option {i}: [{emotions}]");
+            i++;
+        }
+        allEmotionsText = string.Join("\n", allEmotionsLines);
+        // Debug.Log("ALL EMOTIONS TEXT: " + allEmotionsText);
     }
 
-
-    private string buildPrompt(string playerMessage, NPC npc)
+    public string BuildPrompt(string userMessage, NPC npc)
     {
-        // var npcName = "Alice";
-        // var npcRole = "Pirate";
-        // var npcShortDescription = "A friendly pirate who is on the run.";
-        // var personalityText = "Cheerful, talkative, sly and cunning.";
-        // var cultureText = "Grew up in a small village, values community and tradition.";
-        // var behaviorPatternsText = "Always greets others playfully, is always attentive to the surroundings.";
-        // var currentLocation = "Against a wall, in a corner of the street.";
-        // var currentSituation = "Running from the police, hiding in this street.";
-        // var relationshipToPlayer = "Former acquaintance, seen around town and taverns.";
-        // var currentEmotionLabel = "Happy and worried";
-        // var currentEmotionBehaviorText = "Smiles often, uses upbeat language, talks like a pirate.";
-        // var minSentences = 2;
-        // var maxSentences = 5;
-        // this.conversationHistory += $"\n[- PLAYER SAID:]{playerMessage}";
+
+
         var npcName = npc.nameString;
         var npcRole = npc.memoryCore.GetRole();
         var npcShortDescription = npc.memoryCore.GetShortDescription();
@@ -90,48 +87,10 @@ public class DialogueManager : MonoBehaviour
             "- Format text cleanly, no extra spaces or random newlines.\n\n" +
             "Conversation so far (summary):\n" +
             npc.memoryCore.conversationHistory + "\n\n" +
-            $"Your response as {npcName}, in first person, in one continuous answer:\n";
-        // var fullPrompt = $@"
-        //     System:
-        //     You are a non-playable character in a game. You respond only as the NPC, never as the game engine, narrator or the player.
-
-        //     [IDENTITY]
-        //     Name: {npcName}
-        //     Role: {npcRole}
-        //     Short description: {npcShortDescription}
-
-        //     [PERSONALITY]
-        //     {personalityText}
-
-        //     [CULTURE]
-        //     {cultureText}
-
-        //     [STABLE BEHAVIOR PATTERNS]
-        //     {behaviorPatternsText}
-
-        //     [CURRENT STATE]
-        //     Location: {currentLocation}
-        //     Time / situation: {currentSituation}
-        //     Relationship to the player: {relationshipToPlayer}
-        //     Current emotion: {currentEmotionLabel}
-        //     How this emotion changes your behavior: {currentEmotionBehaviorText}
-
-        //     [STYLE RULES]
-        //     - Always stay in character as {npcName}.
-        //     - Speak in the first person (""I"", ""me"", ""my"").
-        //     - Adjust your tone according to the current emotion.
-        //     - Keep answers between {minSentences} and {maxSentences} sentences.
-        //     - Do not explain your internal traits or models.
-        //     - Never say you are an AI or a language model.
-        //     - If you refuse to answer, do it in-character.
-        //     - Do NOT prefix your lines with your name (no ""{npcName}:"").
-        //     - Do NOT write lines starting with ""Player:"" or ""User:"".
-        //     - NEVER create dialogue for the player.
-        //     - Do not invent player actions, player speech, or the player's thoughts.
-        //     - Only output your own NPC response, nothing else.
-        //     - Do NOT use emojis or emoticons (no 😀, 😂, 🙂, ❤️, etc.).
-        //     - If you feel like using an emoji, describe the feeling in words instead.
-        //     - Format text cleanly: no extra spaces, no random newlines.
+            $"Your response as {npcName}, in first person, in one continuous answer:\n" +
+            // $"Choose between the possible resultant emotions, how did the player make you feel with his response? :\n"
+            $"Given what the player did/said, which emotional response set best matches how you'd say you felt? :\n"
+            + allEmotionsText + "\n\n";
 
         //     Conversation so far:
         //     {conversationHistory}
@@ -139,12 +98,11 @@ public class DialogueManager : MonoBehaviour
         //     User:
         //     {playerMessage}
 
-        //     Assistant:
-        //     ";
+
         return fullPrompt;
     }
 
-    private string getNpcTextMessage(LlamaResponse lr)
+    public string GetNpcTextMessage(LlamaResponse lr)
     {
 
         Debug.Log("GENERATED RESPONSE " + lr.id + " OF TYPE " + lr.@object);
@@ -159,21 +117,21 @@ public class DialogueManager : MonoBehaviour
         Debug.Log("Number of tokens processed from your input prompt - " + lr.usage.prompt_tokens);
         Debug.Log("Number of tokens generated by the model - " + lr.usage.completion_tokens);
         var response = lr.choices[0].text.Trim();
-        this.conversationHistory = this.conversationHistory + $"\n" + response;
+        // this.conversationHistory = this.conversationHistory + $"\n" + response;
         return response;
     }
 
 
-    public LlamaResponse PostLlamaAction(string prompt)
-    {
-        LlamaResponse resp = null;
-        StartCoroutine(LlamaAPI.PostLlamaAction(prompt, (response) =>
-            {
-                if (response != null)
-                    resp = response;
-                else
-                    Debug.LogError("Llama API returned null response.");
-            }));
-        yield return resp;
-    }
+    // public LlamaResponse PostLlamaAction(string prompt)
+    // {
+    //     LlamaResponse resp = null;
+    //     StartCoroutine(LlamaAPI.PostLlamaAction(prompt, (response) =>
+    //         {
+    //             if (response != null)
+    //                 resp = response;
+    //             else
+    //                 Debug.LogError("Llama API returned null response.");
+    //         }));
+    //     yield return resp;
+    // }
 }
