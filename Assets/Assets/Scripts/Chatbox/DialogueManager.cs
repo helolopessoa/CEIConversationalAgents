@@ -79,26 +79,32 @@ public class DialogueManager : MonoBehaviour
             "- Adjust your tone according to the current emotion.\n" +
             "- Do not explain your internal traits or models.\n" +
             "- Do not invent player actions, player speech, or the player's thoughts.\n" +
-            "- Only output your own NPC response, nothing else.\n" +
+            // "- Only output your own NPC response, nothing else.\n" +
+           " - Your output consists of an emotional index followed by your spoken dialogue.\n" +
+            "- The emotional index is part of your response and is required.\n" +
             "- Do NOT use emojis or emoticons.\n" +
             "- Do NOT use - when talking, or ;.\n" +
-            "- Do NOT use \n" +
-            "- Do NOT use emojis or emoticons.\n" +
             "- Format text cleanly, no extra spaces or random newlines.\n\n" +
             "Conversation so far (summary):\n" +
             npc.memoryCore.conversationHistory + "\n\n" +
             $"Your response as {npcName}, in first person, in one continuous answer:\n" +
+
+            "[IMPORTANT OUTPUT FORMAT (MANDATORY):]\n\n" +
+            "Before your spoken response, choose EXACTLY ONE emotional response option from the list below.\n" +
+            "Write your answer in this exact format, on a SINGLE LINE:\n" +
+            "[NUMBER] dialogue" + "\n" +
+            // "Where NUMBER is the index of the chosen emotional response option, matching which emotional array you think fist the best given the last player message.\n" +
+            "Where NUMBER is the index of the emotional response option that best matches the emotional impact of the player's last message.\n" +
+            "Emotional response options:\n" +
+            allEmotionsText + "\n\n" +
+            "Do not explain your choice.\n"+ "Do not output anything before the bracket.\n" + "Do not use brackets elsewhere.\n" + 
+            "You must follow this format exactly.";
             // $"Choose between the possible resultant emotions, how did the player make you feel with his response? :\n"
-            $"Given what the player did/said, which emotional response set best matches how you'd say you felt? :\n"
-            + allEmotionsText + "\n\n";
+            // $"Given what the player did/said, which emotional response set best matches how you'd say you felt? :\n"
+            // + allEmotionsText + "\n\n";
 
-        //     Conversation so far:
-        //     {conversationHistory}
-
-        //     User:
-        //     {playerMessage}
-
-
+        Debug.Log("FULL PROMPT: " + fullPrompt);
+        fullPrompt = "Return exactly this text: [1] test";
         return fullPrompt;
     }
 
