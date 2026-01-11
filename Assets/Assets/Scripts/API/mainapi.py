@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import time
-from llamalogic import *
+from Modellogic import *
+from modellogic import *
 from fuzzylogic import *
 
 app = Flask(__name__)
@@ -31,8 +32,8 @@ def post():
 # /<float:axeAF>/<float:axeDT>/<float:axeSJ>/<float:axeAS>
 
 
-###########################
-@app.route('/llamaapi', methods=['POST'])
+# ###########################
+@app.route('/modelapi/answer', methods=['POST'])
 def generate():
     data = request.get_json()
     # print(data)
@@ -42,7 +43,21 @@ def generate():
     
     output = generateResponse(prompt)
     return jsonify(output)
+# ##############################
+
+###########################
+@app.route('/modelapi/classification', methods=['POST'])
+def generate():
+    # data = request.get_json()
+    # # print(data)
+    # prompt = data.get("prompt", "")
+    # # Optional: allow overriding max_tokens from Unity later
+    # # max_tokens = data.get("max_tokens", 150)
+    
+    # output = generateResponse(prompt)
+    # return jsonify(output)
 ##############################
+
 
 @app.route("/ping", methods=["GET"])
 def ping():

@@ -81,7 +81,7 @@ public class NPCMemoryCore : MonoBehaviour
     public string GetCultureDescription() => cultureText; //--> npc get
     public string GetBehaviorPatternsDescription() => behaviorPatternsText;
     public string GetBehaviorChangeDescription() => currentEmotionBehaviorText; //--> npc get
-    public string GetBehaviorChangeDescription() => currentEmotionBehaviorText; //--> npc get
+    // public string GetBehaviorChangeDescription() => currentEmotionBehaviorText; //--> npc get
     public string GetCurrentLocationDescription() => currentLocation; //--> fixed value
     public string GetCurrentSituationDescription() => currentSituation; //--> alters with conversation history
     public string GetRelationshipToPlayerDescription() => relationshipToPlayer; //--> alters with conversation history

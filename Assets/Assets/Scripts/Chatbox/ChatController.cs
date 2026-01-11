@@ -39,7 +39,7 @@ void Awake()
 
     private void Start()
     {
-        // StartCoroutine(LlamaAPI.TestPing((resp) =>
+        // StartCoroutine(ModelAPI.TestPing((resp) =>
         // {
         //     if (resp == null)
         //         Debug.LogError("Ping failed.");
@@ -125,31 +125,30 @@ void Awake()
 
     public void onSendMessage(string userMessage)
     {
-        npc.memoryCore.conversationHistory += $"\n-{userMessage}";
         // 1) show player line immediately
         // chatLog?.UpdateNpcMessage(userMessage);
 
         // 2) build prompt
         string prompt = dm.BuildPrompt(userMessage, npc);
 
-        // 3) call LLaMA asynchronously
-        StartCoroutine(CallLlamaAndShowReply(prompt, userMessage));
+        // 3) call Model asynchronously
+        StartCoroutine(CallModelAndShowReply(prompt, userMessage));
     }
 
-    private IEnumerator CallLlamaAndShowReply(string prompt, string playerMessage)
+    private IEnumerator CallModelAndShowReply(string prompt, string playerMessage)
     {
-        LlamaResponse lr = null;
-        yield return LlamaAPI.PostLlamaAction(prompt, (resp) => lr = resp);
+        ModelResponse lr = null;
+        yield return ModelAPI.PostModelAction(prompt, (resp) => lr = resp);
 
         if (lr == null)
         {
-            npcMessage = "[Erro] Falha na LLaMA.";
+            npcMessage = "[Erro] Falha na Model.";
             chatLog?.UpdateNpcMessage();
             yield break;
         }
 
         npcMessage = dm.GetNpcTextMessage(lr);
-        npc.memoryCore.conversationHistory += $"\n-{npcMessage}";
+        npc.memoryCore.conversationHistory += $"\n-{playerMessage}" + $"\n-{npcMessage}";
         // chatLog.AddNpcMessage(npcText);
         chatLog?.UpdateNpcMessage();
     }

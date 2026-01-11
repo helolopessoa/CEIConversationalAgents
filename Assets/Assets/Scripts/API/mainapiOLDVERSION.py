@@ -1,12 +1,12 @@
 # from flask import Flask, request, jsonify
 # import time
 # # from flask_restful import Api,Resource
-# from llama_cpp import Llama
+# from Model_cpp import Model
 # from fuzzylogic import *
 
 # app = Flask(__name__)
 # # api = Api(app)
-# llm = Llama(model_path="models/llama-pro-8b-instruct.Q6_K.gguf", n_ctx=4096)
+# llm = Model(model_path="models/Model-pro-8b-instruct.Q6_K.gguf", n_ctx=4096)
 
 # # class FuzzyAPI(Resource):
 
@@ -34,10 +34,10 @@
 #     # return request.json();
 # # /<float:axeAF>/<float:axeDT>/<float:axeSJ>/<float:axeAS>
 
-# # class LlamaAPI(Resource):
+# # class ModelAPI(Resource):
 
 # ###########################
-# @app.route('/llamaapi', methods=['POST'])
+# @app.route('/Modelapi', methods=['POST'])
 # def generate():
 #     data = request.get_json()
 #     prompt = data.get("prompt", "")
@@ -48,7 +48,7 @@
 # ##############################
 
 
-# # @app.route('/llamaapi', methods=['POST'])
+# # @app.route('/Modelapi', methods=['POST'])
 # # def generate():
 # #     start_time = time.time()
     
@@ -88,7 +88,7 @@
 # #         )
 # #     except Exception as e:
 # #         # Log server-side, but send a clean error to the client
-# #         app.logger.exception("Error calling LLaMA model")
+# #         app.logger.exception("Error calling Model model")
 # #         return jsonify({"error": "Model generation failed.", "details": str(e)}), 500
 
 # #     elapsed = time.time() - start_time
@@ -112,7 +112,7 @@
 # # api.add_resource(FuzzyAPI, "/fuzzyemotionapi")
 # # /<float:axeAF>/<float:axeDT>/<float:axeSJ>/<float:axeAS>
 
-# # api.add_resource(LlamaAPI, "/llamaapi")
+# # api.add_resource(ModelAPI, "/Modelapi")
 
 
 # # /<float:axeAF>/<float:axeDT>/<float:axeSJ>/<float:axeAS>

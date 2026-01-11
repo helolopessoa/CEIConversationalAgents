@@ -7,6 +7,8 @@ public class ActionEmotions {
     public static Dictionary<string, string[]> GetDict()
     {
         return new Dictionary<string, string[]>() {
+            {"is_talking_politely", new string[4] { "Boredom", "Envy", "Pride", "Serenity" } }, 
+            {"is_not_talking_politely", new string[4] { "Pensiveness", "Guilt", "Morbidness", "Acceptance" } },
 
             {"is_attacking", new string[4] { "Rage", "Outrage", "Despair", "Terror" } },
             {"is_shooting", new string[4] { "Annoyance", "Pessimism", "Disapproval", "Apprehension" } },
@@ -21,11 +23,46 @@ public class ActionEmotions {
             {"is_social", new string[4] { "Distraction", "Anxiety", "Delight", "Interest" } },
             {"is_personal", new string[4] { "Anticipation", "Cynicism", "Curiosity", "Surprise" } },
             {"is_intimate", new string[4] { "Vigilance", "Aggressiveness", "Submission", "Amazement" } },
-
-            {"is_talking_politely", new string[4] { "Boredom", "Envy", "Pride", "Serenity" } }, 
-            {"is_not_talking_politely", new string[4] { "Pensiveness", "Guilt", "Morbidness", "Acceptance" } },
+            
         };
     }
+
+    public static Dictionary<string, string[]> GetDictTalking()
+    {
+        return new Dictionary<string, string[]>() {
+
+            {"is_polite", new string[4] { "Boredom", "Envy", "Pride", "Serenity" } }, 
+            {"is_rude", new string[4] { "Pensiveness", "Guilt", "Morbidness", "Acceptance" } },
+
+            {"is_threatening", new string[4] { "Rage", "Outrage", "Despair", "Terror" } },
+            {"is_intimidating", new string[4] { "Annoyance", "Pessimism", "Disapproval", "Apprehension" } },
+            {"is_hostile", new string[4] { "Anger", "Contempt", "Unbelief", "Fear" } },
+            {"is_accusing", new string[4] { "Anger", "Disapproval", "Pride", "Joy" } },
+
+            {"is_offering", new string[4] { "Joy", "Optimism", "Hope", "Trust" } },
+            {"is_accusing_theft", new string[4] { "Sadness", "Shame", "Remorse", "Disgust" } },
+            {"is_rewarding", new string[4] { "Admiration", "Love", "Sentimentality", "Ecstasy" } },
+            {"is_accusing_greed", new string[4] { "Grief", "Dominance", "Awe", "Loathing" } },
+
+            {"is_social", new string[4] { "Distraction", "Anxiety", "Delight", "Interest" } },
+            {"is_personal", new string[4] { "Anticipation", "Cynicism", "Curiosity", "Surprise" } },
+            {"is_intimate", new string[4] { "Vigilance", "Aggressiveness", "Submission", "Amazement" } },
+
+            
+        };
+    }
+
+
+    // public static List<string> GetOptionToCultureAttributes()
+    // {
+        // return new List<string>(){ "Agressive", "Violent", "Harmful", "Hurting", "Unsparing", "Elusive", "Generous", "Miserly ", "Friendly", "Incisive", "Invasive", "Polite", "Rude" };
+    // }
+
+    public static List<string> GetOptionToCultureAttributes()
+    {
+        return new List<string>(){ "dignity", "collectivism", "collectivism", "trust_level", "wealth", "wealth", "wealth", "wealth", "dignity", "dignity", "dignity", "politeness", "politeness" };
+    }
+
 
     public static Dictionary<string, string> GetCultureAttributes()
     {

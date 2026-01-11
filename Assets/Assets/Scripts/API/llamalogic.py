@@ -1,17 +1,17 @@
-from llama_cpp import Llama
+from llama_cpp import llama
 import os, torch
 
 def auto_gpu_layers():
     # Automatically determine optimal gpu_layers for ctransformers based on available GPU VRAM.
     if not torch.cuda.is_available():
-        # print("[LLAMA] No GPU found → using CPU only.")
+        # print("[Model] No GPU found → using CPU only.")
         return 0
     props = torch.cuda.get_device_properties(0)
     total_vram = props.total_memory
     total_gb = total_vram / (1024 ** 3)
 
-    # print(f"[LLAMA] GPU detected: {props.name}")
-    # print(f"[LLAMA] VRAM: {total_gb:.2f} GB")
+    # print(f"[Model] GPU detected: {props.name}")
+    # print(f"[Model] VRAM: {total_gb:.2f} GB")
 
     if total_gb < 4:
         layers = 0
@@ -26,17 +26,17 @@ def auto_gpu_layers():
     else:
         layers = 50
 
-    # print(f"[LLAMA] Auto-selecting gpu_layers={layers}")
+    # print(f"[Model] Auto-selecting gpu_layers={layers}")
     return layers
 
 max_threads = os.cpu_count()
 max_gpu_layers = auto_gpu_layers()
-MODEL_PATH = "models/llama-pro-8b-instruct.Q6_K.gguf"
+MODEL_PATH = "models/Model-pro-8b-instruct.Q6_K.gguf"
 
 # Load model ONCE globally when this file is imported
 # llm = AutoModelForCausalLM.from_pretrained(
 #     MODEL_PATH,
-#     model_type="llama",
+#     model_type="Model",
 #     gpu_layers= max_gpu_layers,  # increase if you have a GPU
 #     threads = max_threads
 # )
@@ -76,14 +76,14 @@ def generateResponse(full_prompt: str, max_new_tokens: int = 60) -> str:
 # def auto_gpu_layers():
 #     # Automatically determine optimal gpu_layers for ctransformers based on available GPU VRAM.
 #     if not torch.cuda.is_available():
-#         # print("[LLAMA] No GPU found → using CPU only.")
+#         # print("[Model] No GPU found → using CPU only.")
 #         return 0
 #     props = torch.cuda.get_device_properties(0)
 #     total_vram = props.total_memory
 #     total_gb = total_vram / (1024 ** 3)
 
-#     # print(f"[LLAMA] GPU detected: {props.name}")
-#     # print(f"[LLAMA] VRAM: {total_gb:.2f} GB")
+#     # print(f"[Model] GPU detected: {props.name}")
+#     # print(f"[Model] VRAM: {total_gb:.2f} GB")
 
 #     if total_gb < 4:
 #         layers = 0
@@ -98,17 +98,17 @@ def generateResponse(full_prompt: str, max_new_tokens: int = 60) -> str:
 #     else:
 #         layers = 50
 
-#     # print(f"[LLAMA] Auto-selecting gpu_layers={layers}")
+#     # print(f"[Model] Auto-selecting gpu_layers={layers}")
 #     return layers
 
 # max_threads = os.cpu_count()
 # max_gpu_layers = auto_gpu_layers()
-# MODEL_PATH = "models/llama-pro-8b-instruct.Q6_K.gguf"
+# MODEL_PATH = "models/Model-pro-8b-instruct.Q6_K.gguf"
 
 # # Load model ONCE globally when this file is imported
 # llm = AutoModelForCausalLM.from_pretrained(
 #     MODEL_PATH,
-#     model_type="llama",
+#     model_type="Model",
 #     gpu_layers= max_gpu_layers,  # increase if you have a GPU
 #     threads = max_threads
 # )
