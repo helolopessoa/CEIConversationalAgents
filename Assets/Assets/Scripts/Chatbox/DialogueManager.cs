@@ -48,7 +48,7 @@ public class DialogueManager : MonoBehaviour
         // Debug.Log("ALL EMOTIONS TEXT: " + allEmotionsText);
     }
 
-    public string BuildPrompt(string playerMessage, NPC npc)
+    public string BuildDialoguePrompt(string playerMessage, NPC npc)
     {
         var npcName = npc.nameString;
         var npcRole = npc.memoryCore.GetRole();
@@ -62,74 +62,121 @@ public class DialogueManager : MonoBehaviour
         var currentEmotionLabel = "Currently, you are feeling " + npc.emotion.GetName();
         var currentEmotionBehaviorText = npc.memoryCore.GetBehaviorChangeDescription();
         var fullPrompt = $@"
-        [SYSTEM] You have two tasks to fulfill. One is to REMAIN IN CHARACTER as a non-playable character (NPC) in a game, ANSWERING ACCORDINGLY TO THE PLAYER.
-        The second is to CHOOSE WITHIN A LIST OF OPTIONS WHICH OPTION DEFINES THE PLAYER BEHAVIOR THE BEST, BASED ON THE LAST MESSAGE TO YOU.
-        [STYLE RULES]
+        SYSTEM: You are a non-playable character in a game. You respond only as the NPC, never as the game engine, narrator or the player.
+        REMAIN IN CHARACTER as a non-playable character (NPC) in a game, ANSWERING ACCORDINGLY TO THE PLAYER.
+        RULES:
         - NEVER create dialogue for the player.
         - NEVER say you are an AI or a language model.
         - DO NOT explain your internal traits or models.
         - DO NOT invent player actions, player speech, or the player's thoughts.
-        - Your output consists of an emotional index followed by your in-context conversation answer, ALWAYS.
-        - The emotional index is part of your response and is REQUIRED.
+        - Your output consists of your in-context conversation answer.
         - DO NOT use emojis or emoticons.
-        - DO NOT use - when talking, or ;.
-        - DO NOT use | except for splitting the index from your answer.
+        - DO NOT use -, | when talking, or ;.
         - Format text cleanly, no extra spaces or random newlines.
-        - Do NOT infer meaning beyond the literal content of the player's message.
-        [YOUR IDENTITY IN-GAME] 
+        - Answer ONLY your in-context response, no headers, nametags, NOTHING.
+        YOUR IDENTITY IN-GAME: 
         - Name: {npcName}
         - Role: {npcRole}\n
         - Short description: {npcShortDescription}
-        [CONVERSATION SO FAR (SUMMARY)]:
-        - Hello {npcName}.
-        - 12 | Hello there, stranger.
+        CONVERSATION SO FAR (SUMMARY):
         {npc.memoryCore.conversationHistory}
-        [PLAYER LAST MESSAGE:]
+        PLAYER LAST MESSAGE:
         {playerMessage}
-        [OUTPUT FORMAT]
-        - Write your answer in this EXACT FORMAT, ON A SINGLE LINE, SUBSTITUTING BY YOUR CHOICES: [NUMBER] | Your response as {npcName}, in first person, in one continuous answer, to what the player said.
-        - Where NUMBER is the index of your choice, given the player's last message assessed below.
-        [CHOOSE:]
-        {allActionsText}
-        [AND YOUR DIALOGUE RESPONSE AS {npcName}]:
+        OUTPUT FORMAT: Your response as {npcName}, in first person, in one continuous answer, to what the player said.
         ";
-        Debug.Log("FULL PROMPT: " + fullPrompt);
+        Debug.Log("FULL DIALOGUE PROMPT: " + fullPrompt);
         return fullPrompt;
     }
 
+    public string BuildClassificationPrompt(string playerMessage)
+    {
+        var fullPrompt = $@"
+        [SYSTEM] CHOOSE WITHIN A LIST OF OPTIONS WHICH OPTION DEFINES THE PLAYER BEHAVIOR THE BEST, BASED ON THE LAST MESSAGE TO YOU.
+        [STYLE RULES]
+        - Your output consists of an emotional index, ALWAYS.
+        - The emotional index is REQUIRED.
+        - Format text cleanly, no extra spaces or random newlines.
+        - Do NOT infer meaning beyond the literal content of the player's message.
+        [PLAYER LAST MESSAGE:]
+        {playerMessage}
+        [OUTPUT FORMAT]
+        - Write your answer in this EXACT FORMAT, ON A SINGLE LINE, SUBSTITUTING BY YOUR CHOICES: [NUMBER].
+        - Where NUMBER is the index of your choice, given the player's last message assessed below.
+        [CHOOSE:]
+        {allActionsText}
+        ";
+        Debug.Log("FULL CLASSIFICATION PROMPT: " + fullPrompt);
+        return fullPrompt;
+    }
+
+
+
     public string GetNpcTextMessage(ModelResponse lr)
     {
+        Debug.Log("PARSING MODEL RESPONSE...");
+        Debug.Log(lr==null ? "LR IS NULL" : "LR IS NOT NULL");
 
-        Debug.Log("GENERATED RESPONSE " + lr.id + " OF TYPE " + lr.@object);
+        // Debug.Log("GENERATED RESPONSE " + lr.id + " OF TYPE " + lr.@object); --> llama version
+        Debug.Log("GENERATED RESPONSE " + lr.id + " OF TYPE " + lr.model);
         Debug.Log("LR CHOICES, TOTAL OF " + lr.choices.Length);
         foreach (var item in lr.choices)
         {
-            Debug.Log("Text of Index " + item.index + ": "+ item.text);
+            Debug.Log("Text of Index " + item.index + ": "+ item.message.content);
             Debug.Log("Choice of Text Finish Reason: " + item.finish_reason);
             
         }
         Debug.Log("Model USAGE: ");
         Debug.Log("Number of tokens processed from your input prompt - " + lr.usage.prompt_tokens);
         Debug.Log("Number of tokens generated by the model - " + lr.usage.completion_tokens);
-        var response = lr.choices[0].text.Trim();
-        // this.conversationHistory = this.conversationHistory + $"\n" + response;
+        var response = lr.choices[0].message.content.Trim(); 
+        // var response = lr.choices[0].text.Trim(); -> llama version
+        this.conversationHistory = this.conversationHistory + $"\n" + response;
         return response;
     }
-
-
-    // public ModelResponse PostModelAction(string prompt)
-    // {
-    //     ModelResponse resp = null;
-    //     StartCoroutine(ModelAPI.PostModelAction(prompt, (response) =>
-    //         {
-    //             if (response != null)
-    //                 resp = response;
-    //             else
-    //                 Debug.LogError("Model API returned null response.");
-    //         }));
-    //     yield return resp;
-    // }
 }
+
+
+
+        // var fullPrompt = $@"
+        // [SYSTEM] You have two tasks to fulfill. One is to REMAIN IN CHARACTER as a non-playable character (NPC) in a game, ANSWERING ACCORDINGLY TO THE PLAYER.
+        // The second is to CHOOSE WITHIN A LIST OF OPTIONS WHICH OPTION DEFINES THE PLAYER BEHAVIOR THE BEST, BASED ON THE LAST MESSAGE TO YOU.
+        // [STYLE RULES]
+        // - NEVER create dialogue for the player.
+        // - NEVER say you are an AI or a language model.
+        // - DO NOT explain your internal traits or models.
+        // - DO NOT invent player actions, player speech, or the player's thoughts.
+        // - Your output consists of an emotional index followed by your in-context conversation answer, ALWAYS.
+        // - The emotional index is part of your response and is REQUIRED.
+        // - DO NOT use emojis or emoticons.
+        // - DO NOT use - when talking, or ;.
+        // - DO NOT use | except for splitting the index from your answer.
+        // - Format text cleanly, no extra spaces or random newlines.
+        // - Do NOT infer meaning beyond the literal content of the player's message.
+        // [YOUR IDENTITY IN-GAME] 
+        // - Name: {npcName}
+        // - Role: {npcRole}\n
+        // - Short description: {npcShortDescription}
+        // [CONVERSATION SO FAR (SUMMARY)]:
+        // - Hello {npcName}.
+        // - 12 | Hello there, stranger.
+        // {npc.memoryCore.conversationHistory}
+        // [PLAYER LAST MESSAGE:]
+        // {playerMessage}
+        // [OUTPUT FORMAT]
+        // - Write your answer in this EXACT FORMAT, ON A SINGLE LINE, SUBSTITUTING BY YOUR CHOICES: [NUMBER] | Your response as {npcName}, in first person, in one continuous answer, to what the player said.
+        // - Where NUMBER is the index of your choice, given the player's last message assessed below.
+        // [CHOOSE:]
+        // {allActionsText}
+        // [AND YOUR DIALOGUE RESPONSE AS {npcName}]:
+        // ";
+        // Debug.Log("FULL PROMPT: " + fullPrompt);
+
+
+
+
+
+
+
 
 
 //I see temperature must be low for my classification prompt. Let's try.

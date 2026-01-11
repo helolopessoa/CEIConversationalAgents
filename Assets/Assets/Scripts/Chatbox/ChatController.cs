@@ -123,26 +123,32 @@ void Awake()
     //     chatLog?.UpdateNpcMessage();
     // }
 
+// THIS WILL CHANGE: COROUTINES NEED TO BE CONNECTED -> WORKFLOW!!
     public void onSendMessage(string userMessage)
     {
         // 1) show player line immediately
         // chatLog?.UpdateNpcMessage(userMessage);
 
         // 2) build prompt
-        string prompt = dm.BuildPrompt(userMessage, npc);
+        string dialoguePrompt = dm.BuildDialoguePrompt(userMessage, npc);
+        string classificationPrompt = dm.BuildClassificationPrompt(userMessage);
 
         // 3) call Model asynchronously
-        StartCoroutine(CallModelAndShowReply(prompt, userMessage));
+        StartCoroutine(CallModelAndShowReply(dialoguePrompt, userMessage));
+        StartCoroutine(CallModelClassification(classificationPrompt, userMessage));
+
     }
 
     private IEnumerator CallModelAndShowReply(string prompt, string playerMessage)
     {
+        Debug.Log("[ChatController] CallModelAndShowReply(prompt, playerMessage) called.");
         ModelResponse lr = null;
+        // yield return ModelAPI.PostModelActionClassification(prompt, (resp) => lr = resp);
         yield return ModelAPI.PostModelAction(prompt, (resp) => lr = resp);
 
         if (lr == null)
         {
-            npcMessage = "[Erro] Falha na Model.";
+            npcMessage = "[Error] Model failure.";
             chatLog?.UpdateNpcMessage();
             yield break;
         }
@@ -152,6 +158,32 @@ void Awake()
         // chatLog.AddNpcMessage(npcText);
         chatLog?.UpdateNpcMessage();
     }
+
+    private IEnumerator CallModelClassification(string prompt, string playerMessage)
+    {
+        Debug.Log("[ChatController] CallModelClassification(prompt, playerMessage) called.");
+        ModelClassificationResponse lr = null;
+        yield return ModelAPI.PostModelActionClassification(prompt, (resp) => lr = resp);
+
+        if (lr == null)
+        {
+            npcMessage = "[Error] Model failure.";
+            // chatLog?.UpdateNpcMessage();
+
+            yield break;
+        }
+        else
+        {
+            Debug.Log("[ChatController] Classification response received.");
+            Debug.Log(lr.result);
+        }
+
+        // npcMessage = dm.GetNpcTextMessage(lr);
+        // npc.memoryCore.conversationHistory += $"\n-{playerMessage}" + $"\n-{npcMessage}";
+        // // chatLog.AddNpcMessage(npcText);
+        // chatLog?.UpdateNpcMessage();
+    }
+
 }
 
 

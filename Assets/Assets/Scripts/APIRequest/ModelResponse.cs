@@ -1,9 +1,33 @@
-﻿[System.Serializable]
+﻿//OPENAI API OUTPUT VERSION
+using System;
+using UnityEngine;
+
+
+[Serializable]
+public class ModelResponse
+{
+    public string id; 
+    // public string @object; //LLAMA OUTPUT VERSION
+
+    public long created;
+    public string model;
+    public Choice[] choices;
+    public Usage usage;
+}
+
+[Serializable]
+public class ChatCompletionMessage
+{
+    public string role;
+    public string content;
+}
+
+[Serializable]
 public class Choice
 {
-    public string text;
-    public string finish_reason;
     public int index;
+    public string finish_reason;
+    public ChatCompletionMessage message; //LLAMA OUTPUT VERSION -> public string text; Rest is the same
 }
 
 [System.Serializable]
@@ -14,13 +38,9 @@ public class Usage
     public int total_tokens;
 }
 
+
 [System.Serializable]
-public class ModelResponse
+public class ModelClassificationResponse
 {
-    public string id;
-    public string @object; // 'object' is a reserved keyword in C#
-    public long created;
-    public string model;
-    public Choice[] choices;
-    public Usage usage;
+    public string result;
 }

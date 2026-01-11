@@ -37,7 +37,6 @@ public static class ModelAPI
 
     public static IEnumerator PostModelAction(string prompt, Action<ModelResponse> callback)
     {
-
         var body = new { prompt = prompt };
         // Debug.Log("[ModelAPI] Sending prompt to MODEL: " + prompt);
         string json = JsonConvert.SerializeObject(body);
@@ -62,4 +61,33 @@ public static class ModelAPI
         }
         
     }
+
+    public static IEnumerator PostModelActionClassification(string prompt, Action<ModelClassificationResponse> callback)
+    {
+        var body = new { prompt = prompt };
+        // Debug.Log("[ModelAPI] Sending prompt to MODEL: " + prompt);
+        string json = JsonConvert.SerializeObject(body);
+        UnityWebRequest www = new UnityWebRequest(apiModelURL + "/classification", "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+        www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        www.downloadHandler = new DownloadHandlerBuffer();
+        www.SetRequestHeader("Content-Type", "application/json");
+        www.timeout = 300;  // aumenta o timeout
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError("Error calling model: " + www.error);
+            callback(null);
+        }
+        else
+        {
+            string jsonResponse = www.downloadHandler.text;
+            ModelClassificationResponse response = JsonUtility.FromJson<ModelClassificationResponse>(jsonResponse);
+            callback(response);
+        }
+        
+    }
+
+
 }
