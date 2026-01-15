@@ -104,7 +104,13 @@ void Awake()
         chatOpen = true;
         if (chatCanvas != null)
             chatCanvas.SetActive(true);
+            ChangeCanvasPortrait();
             chatLog.Init(this);
+    }
+
+    private void ChangeCanvasPortrait()
+    {
+        chatCanvas.transform.Find("ChatUI/Portrait/CharacterPortrait").GetComponent<UnityEngine.UI.Image>().sprite = npc.npcPortrait;
     }
 
     public void CloseChat()
@@ -141,7 +147,7 @@ void Awake()
 
     private IEnumerator CallModelAndShowReply(string prompt, string playerMessage)
     {
-        Debug.Log("[ChatController] CallModelAndShowReply(prompt, playerMessage) called.");
+        // Debug.Log("[ChatController] CallModelAndShowReply(prompt, playerMessage) called.");
         ModelResponse lr = null;
         // yield return ModelAPI.PostModelActionClassification(prompt, (resp) => lr = resp);
         yield return ModelAPI.PostModelAction(prompt, (resp) => lr = resp);
@@ -152,16 +158,15 @@ void Awake()
             chatLog?.UpdateNpcMessage();
             yield break;
         }
-
         npcMessage = dm.GetNpcTextMessage(lr);
-        npc.memoryCore.conversationHistory += $"\n-{playerMessage}" + $"\n-{npcMessage}";
+        npc.memoryCore.SetConversationHistory("\n" + npcMessage);
         // chatLog.AddNpcMessage(npcText);
         chatLog?.UpdateNpcMessage();
     }
 
     private IEnumerator CallModelClassification(string prompt, string playerMessage)
     {
-        Debug.Log("[ChatController] CallModelClassification(prompt, playerMessage) called.");
+        // Debug.Log("[ChatController] CallModelClassification(prompt, playerMessage) called.");
         ModelClassificationResponse lr = null;
         yield return ModelAPI.PostModelActionClassification(prompt, (resp) => lr = resp);
 
@@ -169,7 +174,6 @@ void Awake()
         {
             npcMessage = "[Error] Model failure.";
             // chatLog?.UpdateNpcMessage();
-
             yield break;
         }
         else
@@ -177,7 +181,7 @@ void Awake()
             Debug.Log("[ChatController] Classification response received.");
             Debug.Log(lr.result);
         }
-
+        npc.DispatchPlayerState(lr.result);
         // npcMessage = dm.GetNpcTextMessage(lr);
         // npc.memoryCore.conversationHistory += $"\n-{playerMessage}" + $"\n-{npcMessage}";
         // // chatLog.AddNpcMessage(npcText);

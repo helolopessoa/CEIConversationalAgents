@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class NPC : MonoBehaviour
@@ -28,14 +29,19 @@ public class NPC : MonoBehaviour
     private float stoppedStateTimer = 0;
 
     [HideInInspector]
-    public string cultureString = "Traveller";
+    public string cultureString;
+    [HideInInspector]
+    public string roleString = "ProPeace";
     [HideInInspector]
     public string humorState = "neutral";
-    public string personalityString = "Type1";
     public string nameString;
-
-
-        Dictionary<string, float> cultureAttrs = new Dictionary<string, float>() {
+    public Sprite npcPortrait;
+    public bool DownsideXRanger = false; //Downsider if True, Ranger if False
+    public bool Leader = false;
+    public bool ProPeace = false;
+    public bool AntiPeace = false;
+    public bool personalityType = true; // Analytical-Reserved if True, Expressive-Adaptive if False
+    Dictionary<string, float> cultureAttrs = new Dictionary<string, float>() {
         { "dignity", 0 },
         { "collectivism", 0 },
         { "wealth", 0 },
@@ -58,10 +64,11 @@ public class NPC : MonoBehaviour
         GenerateInitialPersonality();
         GenerateInitialCulture();
         prejudiceLevel = Random.Range(0f, 1f);
-
-        culture.LoadCultureDict(cultureAttrs);
         humorState = emotion.GetName();
         UpdateCurrentState();
+        memoryCore.npcName = nameString;
+        roleString = Leader ? "Leader" : ProPeace ? "ProPeace" : AntiPeace ? "AntiPeace" : "ProPeace";
+        npcPortrait = transform.Find("Portrait").GetComponent<SpriteRenderer>().sprite;
 
     }
 
@@ -92,7 +99,6 @@ public class NPC : MonoBehaviour
         int infValue = trustInf[mentalStateName];
 
         currentTrust = currentTrust + infValue * prejudiceLevel * (1 / maxTrust);
-
     }
 
 
@@ -101,15 +107,11 @@ public class NPC : MonoBehaviour
     /// </summary>
     void GenerateInitialPersonality()
     {
-        float[] newPersonality = new float[5];
-
-        for (int i = 0; i < newPersonality.Length; i++)
-        {
-            float rand = Random.Range(0f, 1f) * 10f;
-            newPersonality[i] = Mathf.Round(rand) * 0.1f;
-        }
+        float[] newPersonality = new float[5];   
+        newPersonality = Personality.GetPersonalityValueDict()[personalityType ? 0 : 1];
         personality = new Personality(newPersonality);
-    }
+        personality.personalityIndexSet = personalityType;
+        }
 
     /// <summary>
     /// Generates RANDOM bios emotion.
@@ -135,16 +137,18 @@ public class NPC : MonoBehaviour
     /// </summary>
     void GenerateInitialCulture()
     {
+        var cultureIndex = DownsideXRanger ? Culture.downsideIndex : Culture.rangerIndex;
         float[] newCulture = new float[6];
         Dictionary<string, float[]> cultures = Culture.GetCulturesValueDict();
-        int rand = Random.Range(0, 5);
-        cultureString = Culture.Cultures[rand];
+        cultureString = Culture.Cultures[cultureIndex];
         // Debug.Log(cultureString);
         for (int i = 0; i < newCulture.Length; i++)
         {
             newCulture[i] = cultures[cultureString][i];
         }
         culture = new Culture(newCulture);
+        culture.cultureIndex = cultureIndex;
+        culture.LoadCultureDict(cultureAttrs);
     }
 
     /// <summary>
@@ -164,7 +168,7 @@ public class NPC : MonoBehaviour
     public void DispatchPlayerState(string playerState)
     {
 
-        Dictionary<string, string[]> stateEmo = ActionEmotions.GetDict();
+        Dictionary<string, string[]> stateEmo = ActionEmotions.GetDictTalking();
         Dictionary<string, string> stateAttrs = ActionEmotions.GetCultureAttributes();
         Dictionary<string, float[]> allEmo = AllEmotions.GetDict();
 
@@ -172,6 +176,7 @@ public class NPC : MonoBehaviour
         string attrName = stateAttrs[playerState];
         float rat = 1 - culture.GetRationality();
         float attrValue = cultureAttrs[attrName];
+        Debug.Log($"[NPC] DispatchPlayerState: {playerState} -- {stateEmo[playerState]} mapped to attribute {attrName} with values {attrValue}.");
         float result = Mathf.Sqrt(attrValue * rat);
         string resEmotion = emotionsArray[0];
 
@@ -215,7 +220,11 @@ public class NPC : MonoBehaviour
         //// Add new generated emotion
         emotion.AddEmotion(newEmotion);
         emotion.ClampCurrentEmotion();
+    }
 
+    public string GetCurrentEmotionString()
+    {
+        return emotion.GetName();
     }
 
 }

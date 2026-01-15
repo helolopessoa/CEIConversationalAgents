@@ -23,7 +23,6 @@ public class ActionEmotions {
             {"is_social", new string[4] { "Distraction", "Anxiety", "Delight", "Interest" } },
             {"is_personal", new string[4] { "Anticipation", "Cynicism", "Curiosity", "Surprise" } },
             {"is_intimate", new string[4] { "Vigilance", "Aggressiveness", "Submission", "Amazement" } },
-            
         };
     }
 
@@ -62,28 +61,52 @@ public class ActionEmotions {
     {
         return new List<string>(){ "dignity", "collectivism", "collectivism", "trust_level", "wealth", "wealth", "wealth", "wealth", "dignity", "dignity", "dignity", "politeness", "politeness" };
     }
-
-
-    public static Dictionary<string, string> GetCultureAttributes()
+    public static Dictionary<string, string> GetCultureAttributes() //GetCultureAttributesTalking()
     {
         return new Dictionary<string, string>() {
 
-            {"is_attacking", "dignity" },
-            {"is_shooting", "collectivism" },
-            {"is_harming", "collectivism" },
-            {"is_injured", "trust_level" },
+            {"is_polite", "politeness"}, 
+            {"is_rude", "politeness"  },
 
-            {"is_giving_item", "wealth" },
-            {"is_stealing_item", "wealth" },
-            {"is_giving_money", "wealth" },
-            {"is_stealing_money", "wealth" },
+            {"is_threatening", "dignity" },
+            {"is_intimidating", "collectivism" },
+            {"is_hostile", "collectivism" },
+            {"is_accusing", "trust_level" }, //this will probably change
+
+            {"is_offering","wealth"},
+            {"is_accusing_theft","wealth" },
+            {"is_rewarding","wealth" },
+            {"is_accusing_greed", "wealth" },
 
             {"is_social", "dignity" },
             {"is_personal", "dignity" },
             {"is_intimate", "dignity" },
 
-            {"is_talking_politely", "politeness" },
-            {"is_not_talking_politely", "politeness" },
+            
         };
     }
+
+
+    // public static Dictionary<string, string> GetCultureAttributes()
+    // {
+    //     return new Dictionary<string, string>() {
+
+    //         {"is_attacking", "dignity" },
+    //         {"is_shooting", "collectivism" },
+    //         {"is_harming", "collectivism" },
+    //         {"is_injured", "trust_level" },
+
+    //         {"is_giving_item", "wealth" },
+    //         {"is_stealing_item", "wealth" },
+    //         {"is_giving_money", "wealth" },
+    //         {"is_stealing_money", "wealth" },
+
+    //         {"is_social", "dignity" },
+    //         {"is_personal", "dignity" },
+    //         {"is_intimate", "dignity" },
+
+    //         {"is_talking_politely", "politeness" },
+    //         {"is_not_talking_politely", "politeness" },
+    //     };
+    // }
 }

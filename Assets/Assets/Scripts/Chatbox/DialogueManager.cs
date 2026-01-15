@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System.IO.Pipes;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -17,19 +18,6 @@ public class DialogueManager : MonoBehaviour
 
     public void Start()
     {
-        // var dict = ActionEmotions.GetDict();
-        // List<string> allEmotionsLines = new List<string>();
-        // string[] possibleActions = dict.Keys.ToArray();
-        // int i = 1;
-        // foreach (string action in possibleActions)
-        // {
-        //     if (!dict.ContainsKey(action)) continue;
-
-        //     string emotions = string.Join(", ", dict[action]);
-        //     allEmotionsLines.Add($"[{i}]: {emotions}");
-        //     i++;
-        // }
-        // allEmotionsText = string.Join("\n", allEmotionsLines);
         var dict = ActionEmotions.GetDictTalking();
         List<string> allActionsLines = new List<string>();
         string[] possibleActions = dict.Keys.ToArray();
@@ -43,8 +31,6 @@ public class DialogueManager : MonoBehaviour
             i++;
         }
         allActionsText = string.Join("\n", allActionsLines);
-
-        
         // Debug.Log("ALL EMOTIONS TEXT: " + allEmotionsText);
     }
 
@@ -55,12 +41,17 @@ public class DialogueManager : MonoBehaviour
         var npcShortDescription = npc.memoryCore.GetShortDescription();
         var personalityText = npc.memoryCore.GetPersonalityDescription();
         var cultureText = npc.memoryCore.GetCultureDescription();
+        var oppositeCultureText = npc.memoryCore.GetOppositeCultureDescription();
         var behaviorPatternsText = npc.memoryCore.GetBehaviorPatternsDescription();
-        var currentLocation = npc.memoryCore.GetCurrentLocationDescription();
-        var currentSituation = npc.memoryCore.GetCurrentSituationDescription();
-        var relationshipToPlayer = npc.memoryCore.GetRelationshipToPlayerDescription();
-        var currentEmotionLabel = "Currently, you are feeling " + npc.emotion.GetName();
-        var currentEmotionBehaviorText = npc.memoryCore.GetBehaviorChangeDescription();
+        var conversationHistory = npc.memoryCore.GetConversationHistory();
+
+        // var currentLocation = npc.memoryCore.GetCurrentLocationDescription();
+        // var currentSituation = npc.memoryCore.GetCurrentSituationDescription();
+        // var relationshipToPlayer = npc.memoryCore.GetRelationshipToPlayerDescription();
+        // var currentEmotionLabel = "Currently, you are feeling " + npc.emotion.GetName();
+        // var currentEmotionBehaviorText = npc.memoryCore.GetBehaviorChangeDescription();
+        
+        
         var fullPrompt = $@"
         SYSTEM: You are a non-playable character in a game. You respond only as the NPC, never as the game engine, narrator or the player.
         REMAIN IN CHARACTER as a non-playable character (NPC) in a game, ANSWERING ACCORDINGLY TO THE PLAYER.
@@ -77,9 +68,12 @@ public class DialogueManager : MonoBehaviour
         YOUR IDENTITY IN-GAME: 
         - Name: {npcName}
         - Role: {npcRole}\n
-        - Short description: {npcShortDescription}
+        - Behavior: {behaviorPatternsText}
+        - Your personality type: {personalityText}
+        - Your cultural values: {cultureText}
+        - Your vision of the opposite side: {oppositeCultureText}
         CONVERSATION SO FAR (SUMMARY):
-        {npc.memoryCore.conversationHistory}
+        {conversationHistory}
         PLAYER LAST MESSAGE:
         {playerMessage}
         OUTPUT FORMAT: Your response as {npcName}, in first person, in one continuous answer, to what the player said.
@@ -90,25 +84,29 @@ public class DialogueManager : MonoBehaviour
 
     public string BuildClassificationPrompt(string playerMessage)
     {
+        
         var fullPrompt = $@"
         [SYSTEM] CHOOSE WITHIN A LIST OF OPTIONS WHICH OPTION DEFINES THE PLAYER BEHAVIOR THE BEST, BASED ON THE LAST MESSAGE TO YOU.
         [STYLE RULES]
-        - Your output consists of an emotional index, ALWAYS.
-        - The emotional index is REQUIRED.
+        - Your output consists of an emotional key, ALWAYS.
+        - The emotional key is REQUIRED.
         - Format text cleanly, no extra spaces or random newlines.
         - Do NOT infer meaning beyond the literal content of the player's message.
+        [OUTPUT FORMAT]
+        - Write your answer in this EXACT FORMAT, ON A SINGLE LINE, SUBSTITUTING BY YOUR CHOICES: EMOTIONAL_KEY.
+        - Where EMOTIONAL_KEY is the key corresponding of your choice, given the player's last message assessed below.
         [PLAYER LAST MESSAGE:]
         {playerMessage}
-        [OUTPUT FORMAT]
-        - Write your answer in this EXACT FORMAT, ON A SINGLE LINE, SUBSTITUTING BY YOUR CHOICES: [NUMBER].
-        - Where NUMBER is the index of your choice, given the player's last message assessed below.
         [CHOOSE:]
         {allActionsText}
         ";
+
+
         Debug.Log("FULL CLASSIFICATION PROMPT: " + fullPrompt);
+        
+        
         return fullPrompt;
     }
-
 
 
     public string GetNpcTextMessage(ModelResponse lr)
@@ -130,7 +128,6 @@ public class DialogueManager : MonoBehaviour
         Debug.Log("Number of tokens generated by the model - " + lr.usage.completion_tokens);
         var response = lr.choices[0].message.content.Trim(); 
         // var response = lr.choices[0].text.Trim(); -> llama version
-        this.conversationHistory = this.conversationHistory + $"\n" + response;
         return response;
     }
 }
