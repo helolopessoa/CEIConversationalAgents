@@ -7,8 +7,10 @@ using TMPro;
 public class NPC : MonoBehaviour
 {
 
+    // private GameManager gameManager;
     [HideInInspector]
     public Emotion emotion;
+    public GameManager gameManager;
 
     [HideInInspector]
     public Culture culture;
@@ -25,6 +27,7 @@ public class NPC : MonoBehaviour
     [HideInInspector]
     public float currentTrust = 0.5f;
     private string lastMentalState = "Neutral";
+    private string fuzzyResponseEmotion;
     private float neutralStateTimer = 0;
     private float stoppedStateTimer = 0;
 
@@ -55,12 +58,34 @@ public class NPC : MonoBehaviour
     void Awake()
     {
         memoryCore = GetComponent<NPCMemoryCore>();
+        gameManager = FindObjectOfType<GameManager>();
+        npcPortrait = transform.Find("Portrait").GetComponent<SpriteRenderer>().sprite;
+        // var portrait = transform.Find("Portrait");
+        // if(portrait != null)
+        // {
+        //     var portrait1 = portrait.GetComponent<SpriteRenderer>();
+        //     if(portrait1 == null)
+        //     {
+        //         Debug.LogWarning($"[NPC] NPC Portrait is null for NPC: {memoryCore.npcName}");
+        //     }
+        //     else{
+        //         npcPortrait = portrait1.sprite;
+        //         if(npcPortrait == null)
+        //         {
+        //             Debug.LogWarning($"[NPC] NPC Portrait sprite is null for NPC: {memoryCore.npcName}");
+        //         }
+        //     }
+        // }else{
+        //     Debug.LogWarning($"[NPC] NPC Portrait transform not found for NPC: {memoryCore.npcName}");
+        // }
     }
 
     void Start()
     {
+        memoryCore.StartTimer();
         Debug.Log($"[NPC] Starting NPC: {memoryCore.npcName}");
         GenerateInitialEmotion();
+        // StartCoroutine(CallFuzzyModel());
         GenerateInitialPersonality();
         GenerateInitialCulture();
         prejudiceLevel = Random.Range(0f, 1f);
@@ -68,8 +93,7 @@ public class NPC : MonoBehaviour
         UpdateCurrentState();
         memoryCore.npcName = nameString;
         roleString = Leader ? "Leader" : ProPeace ? "ProPeace" : AntiPeace ? "AntiPeace" : "ProPeace";
-        npcPortrait = transform.Find("Portrait").GetComponent<SpriteRenderer>().sprite;
-
+        // npcPortrait = transform.Find("Portrait").GetComponent<SpriteRenderer>().sprite;
     }
 
 
@@ -80,12 +104,16 @@ public class NPC : MonoBehaviour
 
         emotion?.UpdateEmotion(dt);
 
-        // UpdateBehavior(dt);
-        // UpdateCurrentState();
+        UpdateCurrentState();
 
         cultureAttrs["trust_level"] = currentTrust;
-
         humorState = emotion?.GetName();
+        if (gameManager.saveGame)
+        {
+            gameManager.saveGame = false;
+            memoryCore.EndTimer();
+            gameManager.SaveGameData(memoryCore.GetSaveGameData());
+        }
 
     }
 
@@ -97,7 +125,6 @@ public class NPC : MonoBehaviour
         Dictionary<string, int> trustInf = AllEmotions.GetTrustInfluence();
         string mentalStateName = emotion.GetMentalStateName();
         int infValue = trustInf[mentalStateName];
-
         currentTrust = currentTrust + infValue * prejudiceLevel * (1 / maxTrust);
     }
 
@@ -124,8 +151,8 @@ public class NPC : MonoBehaviour
 
         for (int i = 0; i < newEmotion.Length; i++)
         {
-            //newEmotion[i] = randomEmotion[i];
-            newEmotion[i] = 0;
+            newEmotion[i] = randomEmotion[i];
+            // newEmotion[i] = 0;
         }
         emotion = new Emotion(newEmotion);
 
@@ -158,7 +185,10 @@ public class NPC : MonoBehaviour
     {
         Dictionary<string, int> trustInf = AllEmotions.GetTrustInfluence();
         string mentalStateName = emotion.GetMentalStateName();
+        // string mentalStateName = emotion.GetMentalStateName(fuzzyResponseEmotion);
         humorState = mentalStateName.ToLower();
+        // Debug.Log($"[NPC] UpdateCurrentState: humorState -- {humorState}");
+
     }
 
     /// <summary>
@@ -167,30 +197,26 @@ public class NPC : MonoBehaviour
     /// <param name="playerState">Player current action state.</param>
     public void DispatchPlayerState(string playerState)
     {
-
+        Debug.Log($"[NPC] DispatchPlayerState: playerState -- {playerState}");
         Dictionary<string, string[]> stateEmo = ActionEmotions.GetDictTalking();
         Dictionary<string, string> stateAttrs = ActionEmotions.GetCultureAttributes();
         Dictionary<string, float[]> allEmo = AllEmotions.GetDict();
-
-        string[] emotionsArray = stateEmo[playerState];
+        stateEmo.TryGetValue(playerState, out string[] emotionsArray);
         string attrName = stateAttrs[playerState];
         float rat = 1 - culture.GetRationality();
         float attrValue = cultureAttrs[attrName];
-        Debug.Log($"[NPC] DispatchPlayerState: {playerState} -- {stateEmo[playerState]} mapped to attribute {attrName} with values {attrValue}.");
         float result = Mathf.Sqrt(attrValue * rat);
-        string resEmotion = emotionsArray[0];
+        string resEmotion = emotionsArray[0]; // a starter
+
 
         for (int i = 1; i < emotionBands.Length; i++)
         {
-            if (result > emotionBands[i])
+            if (result > emotionBands[i]) // defining rationality for intensity of emotion felt
             {
                 resEmotion = emotionsArray[i];
             }
         }
-
         UpdateEmotionByEvent(allEmo[resEmotion]);
-        UpdateTrustLevel();
-        UpdateCurrentState();
     }
 
     /// <summary>
@@ -220,11 +246,36 @@ public class NPC : MonoBehaviour
         //// Add new generated emotion
         emotion.AddEmotion(newEmotion);
         emotion.ClampCurrentEmotion();
+        // StartCoroutine(CallFuzzyModel());
+        UpdateCurrentState();
+        UpdateTrustLevel();
     }
 
+
+
+    
+    
     public string GetCurrentEmotionString()
     {
         return emotion.GetName();
     }
 
+
+
+    // private IEnumerator CallFuzzyModel()
+    // {
+    //     // Debug.Log("[ChatController] CallModelClassification(prompt, playerMessage) called.");
+    //     FuzzyResponse fr = null;
+    //     yield return FuzzyAPI.PostFuzzyEmotionalInput(emotion.GetEmotion(), (resp) => fr = resp);
+    //     if (fr == null)
+    //     {
+    //         yield break;
+    //     }
+    //     else
+    //     {
+    //         Debug.Log("[NPC] Fuzzy response received.");
+    //         Debug.Log(fr.emotion);
+    //     }
+    //     fuzzyResponseEmotion = fr.emotion;
+    // }
 }

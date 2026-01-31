@@ -6,46 +6,46 @@ using UnityEngine.Networking;
 
 public static class FuzzyAPI
 {
-    private static string apiURL = "http://127.0.0.1:11434";
+    private static string apiURL = "http://127.0.0.1:11434/modelapi";
     private static string apiFuzzyURL = apiURL + "/fuzzyapi";
 
-    /// <summary>
-    /// GET /fuzzyapi -> returns FuzzyResponse asynchronously.
-    /// Usage: StartCoroutine(FuzzyAPI.GetFuzzyEmotionalResponse(OnFuzzyResponse));
-    /// </summary>
-    public static IEnumerator GetFuzzyEmotionalResponse(Action<FuzzyResponse> callback)
-    {
-        using (UnityWebRequest www = UnityWebRequest.Get(apiFuzzyURL))
-        {
-            www.timeout = 10;
+    // /// <summary>
+    // /// GET /fuzzyapi -> returns FuzzyResponse asynchronously.
+    // /// Usage: StartCoroutine(FuzzyAPI.GetFuzzyEmotionalResponse(OnFuzzyResponse));
+    // /// </summary>
+    // public static IEnumerator FuzzyEmotionalResponse(Action<FuzzyResponse> callback)
+    // {
+    //     using (UnityWebRequest www = UnityWebRequest.Get(apiFuzzyURL))
+    //     {
+    //         www.timeout = 10;
 
-            yield return www.SendWebRequest();
+    //         yield return www.SendWebRequest();
 
-            if (www.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("[FUZZY] GET error: " + www.error);
-                callback?.Invoke(null);
-            }
-            else
-            {
-                string json = www.downloadHandler.text;
-                // Debug.Log("[FUZZY] GET response: " + json);
-                FuzzyResponse resp = JsonUtility.FromJson<FuzzyResponse>(json);
-                callback?.Invoke(resp);
-            }
-        }
-    }
+    //         if (www.result != UnityWebRequest.Result.Success)
+    //         {
+    //             Debug.LogError("[FUZZY] GET error: " + www.error);
+    //             callback?.Invoke(null);
+    //         }
+    //         else
+    //         {
+    //             string json = www.downloadHandler.text;
+    //             // Debug.Log("[FUZZY] GET response: " + json);
+    //             FuzzyResponse resp = JsonUtility.FromJson<FuzzyResponse>(json);
+    //             callback?.Invoke(resp);
+    //         }
+    //     }
+    // }
 
     /// <summary>
     /// POST /fuzzyapi with 4 emotion axes as x-www-form-urlencoded
     /// Usage: StartCoroutine(FuzzyAPI.PostFuzzyEmotionalInput(currentEmotion));
     /// </summary>
-    public static IEnumerator PostFuzzyEmotionalInput(float[] currentEmotion, Action<bool> callback = null)
+    public static IEnumerator PostFuzzyEmotionalInput(float[] currentEmotion, Action<FuzzyResponse> callback)
     {
         if (currentEmotion == null || currentEmotion.Length < 4)
         {
             Debug.LogError("[FUZZY] currentEmotion must have 4 values.");
-            callback?.Invoke(false);
+            callback?.Invoke(null);
             yield break;
         }
 
@@ -66,14 +66,14 @@ public static class FuzzyAPI
             if (www.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("[FUZZY] POST error: " + www.error);
-                callback?.Invoke(false);
+                callback?.Invoke(null);
             }
             else
             {
-                // Optional: read server response if you want
-                string responseString = www.downloadHandler.text;
-                // Debug.Log("[FUZZY] POST response: " + responseString);
-                callback?.Invoke(true);
+                string json = www.downloadHandler.text;
+                // Debug.Log("[FUZZY] GET response: " + json);
+                FuzzyResponse resp = JsonUtility.FromJson<FuzzyResponse>(json);
+                callback?.Invoke(resp);
             }
         }
     }
@@ -94,10 +94,9 @@ public static class FuzzyAPI
 // {
 //     private static string apiURL = "http://localhost:11434";
 //     private static string apiFuzzyURL = apiURL + "/fuzzyapi";
-// // // export apiURL = "http://127.0.0.1:5000/"
 
 
-//         public static FuzzyResponse getFuzzyEmotionalResponse()
+//         public static FuzzyResponse GetFuzzyEmotionalResponse()
 //         {
 //             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(apiFuzzyURL);
 //             request.Method = "GET";
@@ -108,7 +107,7 @@ public static class FuzzyAPI
 
 //       }
 
-//     public static void postFuzzyEmotionalInput(float[] currentEmotion)
+//     public static void PostFuzzyEmotionalInput(float[] currentEmotion)
 //     {
 //         string[] emotionKeys = { "axeAF", "axeDT", "axeSJ", "axeAS" };
 //         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(apiFuzzyURL);

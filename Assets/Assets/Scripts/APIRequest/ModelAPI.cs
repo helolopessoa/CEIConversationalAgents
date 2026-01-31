@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-// using System.Net;
 using System.IO;
 using System;
 using UnityEngine.Networking;
@@ -9,8 +8,7 @@ using System.Text;
 
 public static class ModelAPI
 {
-    private static string apiURL = "http://localhost:11434";
-    private static string apiModelURL = apiURL + "/modelapi";
+    private static string apiURL = "http://localhost:11434/modelapi";
 
     public static IEnumerator TestPing(Action<string> callback)
     {
@@ -40,7 +38,7 @@ public static class ModelAPI
         var body = new { prompt = prompt };
         // Debug.Log("[ModelAPI] Sending prompt to MODEL: " + prompt);
         string json = JsonConvert.SerializeObject(body);
-        UnityWebRequest www = new UnityWebRequest(apiModelURL + "/answer", "POST");
+        UnityWebRequest www = new UnityWebRequest(apiURL + "/answer", "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
         www.uploadHandler = new UploadHandlerRaw(bodyRaw);
         www.downloadHandler = new DownloadHandlerBuffer();
@@ -67,7 +65,7 @@ public static class ModelAPI
         var body = new { prompt = prompt };
         // Debug.Log("[ModelAPI] Sending prompt to MODEL: " + prompt);
         string json = JsonConvert.SerializeObject(body);
-        UnityWebRequest www = new UnityWebRequest(apiModelURL + "/classification", "POST");
+        UnityWebRequest www = new UnityWebRequest(apiURL + "/classification", "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
         www.uploadHandler = new UploadHandlerRaw(bodyRaw);
         www.downloadHandler = new DownloadHandlerBuffer();

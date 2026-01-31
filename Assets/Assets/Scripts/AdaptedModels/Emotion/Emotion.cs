@@ -15,7 +15,7 @@ public class Emotion {
     // [3] AntecipationXSurprise [Range(-1f, 1f)]
     
     float[] currentEmotion = new float[4];
-    // float[] influentEmotion = new float[4];
+    float[] influentEmotion = new float[4];
 
     // Represents the bios emotion
     float[] bios = new float[4];
@@ -34,6 +34,8 @@ public class Emotion {
     public Emotion(float[] newEmotion) {
         InitializeEmotion(newEmotion);
         LoadBios();
+        // GetFuzzyEmotion();
+        SetMostInfluentEmotion();
     }
 
 
@@ -42,9 +44,9 @@ public class Emotion {
     }
 
 
-    // public float[] GetMostInfluentEmotion() {
-    //    return influentEmotion;
-    // }
+    public float[] GetMostInfluentEmotion() {
+       return influentEmotion;
+    }
 
     /// <summary>
     /// Apply the initial emotion values to the bios.
@@ -115,27 +117,31 @@ public class Emotion {
 
         // Clamp after update
         ClampCurrentEmotion();
+        // PostFuzzyEmotion();
+        SetMostInfluentEmotion();
     }
 
     public string GetName() {
         Dictionary<string, float[]> allEmotions = AllEmotions.GetDict();
-        currentEmotion = GetEmotion();
         return allEmotions.FirstOrDefault(x => x.Value.SequenceEqual(currentEmotion)).Key;
     }
 
 
-    // public string GetMostInfluentName() {
-    //    Dictionary<string, float[]> allEmotions = AllEmotions.GetDict();
+    public string GetMostInfluentName() {
+       Dictionary<string, float[]> allEmotions = AllEmotions.GetDict();
 
-    //    return allEmotions.FirstOrDefault(x => x.Value.SequenceEqual(influentEmotion)).Key;
-    // }
+       return allEmotions.FirstOrDefault(x => x.Value.SequenceEqual(influentEmotion)).Key;
+    }
 
+    // public string GetMentalStateName(string fuzzyNameEmotion)
     public string GetMentalStateName()
     {
         Dictionary<string, string> mentalStates = AllEmotions.GetMentalState();
+        string name = GetMostInfluentName();
+        return mentalStates[name];
+        // Dictionary<string, string> mentalStates = AllEmotions.GetMentalState();
         // string name = GetFuzzyEmotion();
-        // string name = GetFuzzyEmotion();
-        return mentalStates[GetName()];
+        // return mentalStates[fuzzyNameEmotion];
     }
 
 
@@ -161,14 +167,70 @@ public class Emotion {
         }
     }
 
-    // public string GetFuzzyEmotion()
-    // {
-    //     FuzzyResponse fr = FuzzyAPI.GetFuzzyEmotionalResponse();
-    //     return fr.emotion;
-    // }
+    /// <summary>
+    /// Sets the most influent emotion.
+    /// </summary>
+    public void SetMostInfluentEmotion() {
+        float biggestValue = Mathf.Abs(currentEmotion[0]);
 
-    // public void PostFuzzyEmotion()
-    // {
-    //     FuzzyAPI.PostFuzzyEmotionalInput(currentEmotion);
-    // }
+        for (int i = 1; i < currentEmotion.Length; i++) {
+            float currentValue = Mathf.Abs(currentEmotion[i]);
+            influentEmotion[i] = 0;
+
+            if (currentValue > biggestValue) {
+                biggestValue = currentValue;
+            }
+        }
+
+        for (int i = 0; i < currentEmotion.Length; i++) {
+            float currentValue = Mathf.Abs(currentEmotion[i]);
+
+            if ((biggestValue - currentValue) <= 0) {
+                influentEmotion[i] = currentEmotion[i];
+            }
+        }
+
+        int count = 0;
+        for (int i = 0; i < influentEmotion.Length; i++) {
+            float value = Mathf.Abs(influentEmotion[i]);
+            if (value > 0) {
+                count += 1;
+            }
+        }
+
+        for (int i = 0; i < influentEmotion.Length; i++)
+        {
+            float value = Mathf.Abs(influentEmotion[i]);
+            float sign = Mathf.Sign(influentEmotion[i]);
+
+            if (count <= 1) {
+                if (value <= 0.1f) {
+                    influentEmotion[i] = 0;
+                }
+                else if (value <= 0.3f) {
+                    influentEmotion[i] = 0.2f;
+                }
+                else if (value <= 0.5f) {
+                    influentEmotion[i] = 0.5f;
+                }
+                else {
+                    influentEmotion[i] = 1.0f;
+                }
+            }
+            else if (count == 2) {
+                if (value <= 0.5f) {
+                    influentEmotion[i] = 0;
+                }
+                else {
+                    influentEmotion[i] = 0.5f;
+                }
+            }
+            else { 
+                influentEmotion[i] = 0;
+            }
+
+            influentEmotion[i] = sign * influentEmotion[i];
+        }
+    }
+
 }

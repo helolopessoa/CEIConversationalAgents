@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;  
@@ -22,7 +21,8 @@ public class ChatController : MonoBehaviour
     private NPC npc;
     
     [Header("UI")]
-    public GameObject chatCanvas;          // canvas to show for this NPC
+    // public GameObject chatCanvas;          // canvas to show for this NPC
+    public GameObject chatUI;          // canvas to show for this NPC
 
     [Header("References")]
     public PlayerController2D player;      // assign in inspector (or auto-find)
@@ -34,7 +34,7 @@ void Awake()
         npc = this.GetComponent<NPC>();
         var chatUIMap = chatInputAsset.FindActionMap("ChatboxUI", true);
         sendChatAction = chatUIMap.FindAction("SendMessage", true);
-        
+        // npcMessage = npc.memoryCore.npcMessage;
     }
 
     private void Start()
@@ -47,10 +47,9 @@ void Awake()
         //         Debug.Log("Ping succeeded. Server replied: " + resp);
         // }));
         Debug.Log("[ChatController] Starting ChatController for NPC: " + npc);
+        if (chatUI != null)
+            chatUI.SetActive(false);
         npcMessage = npc.memoryCore.npcMessage;
-        chatLog?.UpdateNpcMessage();
-        if (chatCanvas != null)
-            chatCanvas.SetActive(false);
     }
         private void OnEnable()
     {
@@ -102,66 +101,37 @@ void Awake()
         if (chatOpen) return;
 
         chatOpen = true;
-        if (chatCanvas != null)
-            chatCanvas.SetActive(true);
+        if (chatUI != null)
+            chatUI.SetActive(true);
             ChangeCanvasPortrait();
             chatLog.Init(this);
     }
 
     private void ChangeCanvasPortrait()
     {
-        chatCanvas.transform.Find("ChatUI/Portrait/CharacterPortrait").GetComponent<UnityEngine.UI.Image>().sprite = npc.npcPortrait;
+        chatUI.transform.Find("Portrait/CharacterPortrait").GetComponent<UnityEngine.UI.Image>().sprite = npc.npcPortrait;
     }
 
     public void CloseChat()
     {
         if (!chatOpen) return;
         chatOpen = false;
-        if (chatCanvas != null)
-            chatCanvas.SetActive(false);
+        if (chatUI != null)
+            chatUI.SetActive(false);
     }
 
-    // public void onSendMessage(string userMessage)
-    // {
-    //     npc.memoryCore.conversationHistory += $"\n-{userMessage}";
-    //     npcMessage = dm.getNpcMessage(userMessage, npc);
-    //     npc.memoryCore.conversationHistory += $"\n-{npcMessage}";
-    //     chatLog?.UpdateNpcMessage();
-    // }
 
-// THIS WILL CHANGE: COROUTINES NEED TO BE CONNECTED -> WORKFLOW!!
-    public void onSendMessage(string userMessage)
+    public void onSendMessage(string playerMessage)
     {
         // 1) show player line immediately
         // chatLog?.UpdateNpcMessage(userMessage);
 
         // 2) build prompt
-        string dialoguePrompt = dm.BuildDialoguePrompt(userMessage, npc);
-        string classificationPrompt = dm.BuildClassificationPrompt(userMessage);
+        string classificationPrompt = dm.BuildClassificationPrompt(playerMessage);
 
         // 3) call Model asynchronously
-        StartCoroutine(CallModelAndShowReply(dialoguePrompt, userMessage));
-        StartCoroutine(CallModelClassification(classificationPrompt, userMessage));
+        StartCoroutine(CallModelClassification(classificationPrompt, playerMessage));
 
-    }
-
-    private IEnumerator CallModelAndShowReply(string prompt, string playerMessage)
-    {
-        // Debug.Log("[ChatController] CallModelAndShowReply(prompt, playerMessage) called.");
-        ModelResponse lr = null;
-        // yield return ModelAPI.PostModelActionClassification(prompt, (resp) => lr = resp);
-        yield return ModelAPI.PostModelAction(prompt, (resp) => lr = resp);
-
-        if (lr == null)
-        {
-            npcMessage = "[Error] Model failure.";
-            chatLog?.UpdateNpcMessage();
-            yield break;
-        }
-        npcMessage = dm.GetNpcTextMessage(lr);
-        npc.memoryCore.SetConversationHistory("\n" + npcMessage);
-        // chatLog.AddNpcMessage(npcText);
-        chatLog?.UpdateNpcMessage();
     }
 
     private IEnumerator CallModelClassification(string prompt, string playerMessage)
@@ -182,10 +152,26 @@ void Awake()
             Debug.Log(lr.result);
         }
         npc.DispatchPlayerState(lr.result);
-        // npcMessage = dm.GetNpcTextMessage(lr);
-        // npc.memoryCore.conversationHistory += $"\n-{playerMessage}" + $"\n-{npcMessage}";
-        // // chatLog.AddNpcMessage(npcText);
-        // chatLog?.UpdateNpcMessage();
+        Debug.Log("[ChatController] Dispatching player state: " + lr.result);
+        string dialoguePrompt = dm.BuildDialoguePrompt(playerMessage, npc);
+        StartCoroutine(CallModelAndShowReply(dialoguePrompt, playerMessage));
+    }
+
+        private IEnumerator CallModelAndShowReply(string prompt, string playerMessage)
+    {
+        Debug.Log("[ChatController] CallModelAndShowReply(prompt, playerMessage) called.");
+        ModelResponse lr = null;
+        yield return ModelAPI.PostModelAction(prompt, (resp) => lr = resp);
+
+        if (lr == null)
+        {
+            npcMessage = "[Error] Model failure.";
+            chatLog?.UpdateNpcMessage();
+            yield break;
+        }
+        npcMessage = dm.GetNpcTextMessage(lr);
+        npc.memoryCore.SetConversationHistory(playerMessage + "\n" + npcMessage);
+        chatLog?.UpdateNpcMessage();
     }
 
 }
