@@ -5,12 +5,15 @@ using UnityEngine;
 [System.Serializable]
 public class SaveGameData
 {
+    public string playerName;
     public string npcName;
     public string npcRoleTitle;
+    public string npcCulture;
+    public string npcPersonality;
     public string chatSummary;
     public List<string> emotions = new List<string>();
     public List<string> classifications = new List<string>();
-    public bool peaceTreatySigned;
+    public bool peaceTreatySigned = true;
     public float playTime;
 
 }

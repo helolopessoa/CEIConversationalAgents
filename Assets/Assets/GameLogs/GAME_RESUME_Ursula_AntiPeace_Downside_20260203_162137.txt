@@ -1,0 +1,19 @@
+Date: 03/02/2026 16:21:37
+Play Time: 04 minutes and 19 seconds
+Player: Helo
+NPC: Ursula
+NPC Role: AntiPeace
+NPC Cuture: Downside
+NPC Personality Type: True - Analytical–Reserved
+Conversation: 
+[PLAYER] Hey Urusla, what's up?
+[Ursula] Things are heating up, Helo. The Rangers are getting too comfortable thinking they can dictate terms. I can't shake the feeling that any talk of peace is just a way for them to gain the upper hand. We need to stay sharp and ready to
+
+
+Classifications:
+Hey Urusla, what's up? -- is_social
+
+
+Emotions:
+, anticipation, 
+Success of Peace Treaty: False

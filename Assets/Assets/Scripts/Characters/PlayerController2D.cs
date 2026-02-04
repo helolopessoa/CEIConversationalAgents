@@ -15,8 +15,8 @@ public class PlayerController2D : MonoBehaviour
     private InputAction moveAction;
     private InputAction openChatAction;
     private InputAction closeChatAction;
-    // private InputAction sendChatAction;
-    public bool canMove { get; private set; } = true;
+    private GameObject trigger;
+    public bool canMove { get; private set; } = false;
     private float moveInput;
 
 
@@ -33,7 +33,8 @@ public class PlayerController2D : MonoBehaviour
         moveAction      = playerMap.FindAction("Move", true);
         openChatAction  = playerMap.FindAction("OpenChatbox", true);
         closeChatAction = chatUIMap.FindAction("CloseChat", true);
-        
+        trigger = transform.Find("TriggerCollider").gameObject;
+        trigger.SetActive(false);
     }
 
     private void OnEnable()
@@ -72,7 +73,7 @@ public class PlayerController2D : MonoBehaviour
         if (currentChatZone == null) return;
 
         currentChatZone.CloseChat();
-        ResumeMovement();
+        canMove = true;
     }
 
 
@@ -113,5 +114,12 @@ public class PlayerController2D : MonoBehaviour
     public void ResumeMovement()
     {
         canMove = true;
+        trigger.SetActive(true);
+    }
+
+    public void StopMovement()
+    {
+        canMove = false;
+        trigger.SetActive(false);
     }
 }

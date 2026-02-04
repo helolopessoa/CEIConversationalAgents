@@ -8,7 +8,6 @@ public class ChatController : MonoBehaviour
 
     [HideInInspector]
     public string npcMessage;
-    // public string userMessage;
     
     [SerializeField]
     private DialogueManager dm;
@@ -21,7 +20,6 @@ public class ChatController : MonoBehaviour
     private NPC npc;
     
     [Header("UI")]
-    // public GameObject chatCanvas;          // canvas to show for this NPC
     public GameObject chatUI;          // canvas to show for this NPC
 
     [Header("References")]
@@ -51,7 +49,7 @@ void Awake()
             chatUI.SetActive(false);
         npcMessage = npc.memoryCore.npcMessage;
     }
-        private void OnEnable()
+    private void OnEnable()
     {
         // enable chat UI actions (elas podem ficar sempre ligadas;
         // a gente só reage se o chat estiver aberto)
@@ -105,6 +103,7 @@ void Awake()
             chatUI.SetActive(true);
             ChangeCanvasPortrait();
             chatLog.Init(this);
+            chatLog.UpdateNpcMessage();
     }
 
     private void ChangeCanvasPortrait()
@@ -152,7 +151,9 @@ void Awake()
             Debug.Log(lr.result);
         }
         npc.DispatchPlayerState(lr.result);
+
         Debug.Log("[ChatController] Dispatching player state: " + lr.result);
+        npc.memoryCore.SetClassification(playerMessage, lr.result);
         string dialoguePrompt = dm.BuildDialoguePrompt(playerMessage, npc);
         StartCoroutine(CallModelAndShowReply(dialoguePrompt, playerMessage));
     }
@@ -170,7 +171,7 @@ void Awake()
             yield break;
         }
         npcMessage = dm.GetNpcTextMessage(lr);
-        npc.memoryCore.SetConversationHistory(playerMessage + "\n" + npcMessage);
+        npc.memoryCore.SetConversationHistory(playerMessage, npcMessage);
         chatLog?.UpdateNpcMessage();
     }
 

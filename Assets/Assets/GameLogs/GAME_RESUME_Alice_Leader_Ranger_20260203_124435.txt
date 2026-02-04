@@ -1,0 +1,24 @@
+Date: 03/02/2026 12:44:35
+Play Time: 01 minutes and 20 seconds
+NPC: Alice
+NPC Role: Leader
+NPC Cuture: Ranger
+NPC Personality Type: True - Analytical–Reserved
+Conversation: 
+[PLAYER] hEY aLICE, HOW ARE YOU TODAY? fEELING NICE?
+[Alice] I'm not feeling quite nice, to be honest. There's a heaviness in the air with everything going on. The war weighs on my mind, and I can't shake the fear of what might happen next. We need to think carefully about our choices,
+[PLAYER] I1m sorrry to hear that. I think talking about it will make you feel better. Care to share?
+[Alice] I appreciate your concern, but it's hard to shake this feeling. The stakes are high, and every decision we make could lead to more suffering or even loss. I worry about our future and the well-being of our people. The Downsiders don’t
+[PLAYER] I see, and why do you think that isd?
+[Alice] The Downsiders operate with a short-sighted focus that puts us all at risk. They prioritize immediate gains without considering the long-term consequences of their actions. It’s like they’re playing a game without thinking about the end result. I fear that if
+
+
+Classifications:
+hEY aLICE, HOW ARE YOU TODAY? fEELING NICE? -- is_social
+I1m sorrry to hear that. I think talking about it will make you feel better. Care to share? -- is_polite
+I see, and why do you think that isd? -- is_polite
+
+
+Emotions:
+, fear, , fear, , fear, 
+Success of Peace Treaty: False

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Globalization;
+using System.Xml.Linq;
 
 public class NPCMemoryCore : MonoBehaviour
 {
     [Header("Default values (editable in Inspector)")]
+    public string playerName;
     public string npcName;
     public string npcShortDescription;
     public string behaviorPatternsText;
@@ -23,17 +25,22 @@ public class NPCMemoryCore : MonoBehaviour
     public string npcMessage;
     private string conversationHistory;
     private NPC npc;
-    // [HideInInspector]
     private SaveGameData saveGameData;
 
     void Awake()
     {
         npc = GetComponent<NPC>();
-        // Debug.Log("NPC Found " + npc == null ? "null" : npc.name);
+        Reset();
+    }
+    public void Reset()
+    {
+        npcName = npc.nameString;
         npcMessage = $"Hello, I'm {npcName}.";
+        conversationHistory = "";
         saveGameData = new SaveGameData();
         saveGameData.npcName = npcName;
         saveGameData.npcRoleTitle = npc.roleString;
+        saveGameData.playTime = Time.time;
     }
 
     public string GetRole() => NPCRole.GetRolesDict()[npc.roleString]; //--> fixed value
@@ -57,29 +64,24 @@ public class NPCMemoryCore : MonoBehaviour
     public string GetBehaviorChangeDescription() => currentEmotionBehaviorText; //--> npc get
     public string GetCurrentLocationDescription() => currentLocation; //--> fixed value
     public string GetCurrentSituationDescription() => currentSituation; //--> alters with conversation history
-    public string GetRelationshipToPlayerDescription() => @$"Your trust in the player is {npc.currentTrust}, out of total of 1.0f"; //--> alters with conversation history
+    public string GetRelationshipToPlayerDescription() => @$"Your trust in {playerName} is {npc.currentTrust}, out of total of 1.0f"; //--> alters with conversation history
     public string GetConversationHistory() => conversationHistory; //--> alters with conversation history
-    public string SetConversationHistory(string newMessage) => this.conversationHistory += newMessage; //--> alters with conversation history
-    public void SetClassification(string newMessage, string classification) => saveGameData.classifications.Add(@$"Player message: {newMessage} -- NPC Classification: {classification}"); //--> alters with conversation history
-    /// <summary>
-    /// //////////////
-    /// </summary>
-    /// <returns></returns>
+    public string SetConversationHistory(string playerMessage, string npcMessage) => conversationHistory += "\n[PLAYER] " + playerMessage + $"\n[{npcName}] " + npcMessage; //--> alters with conversation history
+    public void SetClassification(string newMessage, string classification) => saveGameData.classifications.Add(@$"{newMessage} -- {classification}"); //--> alters with conversation history
+    public void SetResponseEmotion(string emotion) => saveGameData.emotions.Add(emotion); //--> alters with conversation history
     public string GetCultureDescription() => Culture.GetCulturePromptsDict()[npc.cultureString]; //--> npc get
     public string GetOppositeCultureDescription() => Culture.GetCulturePromptsDict()["VisionFrom" + npc.cultureString]; //--> npc get
-    public void StartTimer()
-    {
-        saveGameData.playTime = Time.time;
-    }
-    public void EndTimer()
-    {
-        saveGameData.playTime = Time.time - saveGameData.playTime;
-    }
     public SaveGameData GetSaveGameData()
     {
+        saveGameData.playerName = playerName;
         saveGameData.npcName = npcName;
+        saveGameData.npcRoleTitle = npc.roleString;
+        saveGameData.npcCulture = npc.cultureString;
+        saveGameData.npcPersonality = npc.personalityType.ToString();
+        saveGameData.npcPersonality+= npc.personalityType ? " - Analytical–Reserved" : " - Expressive–Adaptive";
         saveGameData.chatSummary = conversationHistory;
         saveGameData.peaceTreatySigned = false;
+        saveGameData.playTime = Time.time - saveGameData.playTime;
         return saveGameData;
     }
 }

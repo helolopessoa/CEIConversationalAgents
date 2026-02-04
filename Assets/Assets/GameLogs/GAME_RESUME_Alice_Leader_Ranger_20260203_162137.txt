@@ -1,0 +1,19 @@
+Date: 03/02/2026 16:21:37
+Play Time: 04 minutes and 19 seconds
+Player: Helo
+NPC: Alice
+NPC Role: Leader
+NPC Cuture: Ranger
+NPC Personality Type: True - Analytical–Reserved
+Conversation: 
+[PLAYER] Hey Alice, how are you today?
+[Alice] I'm doing alright, just keeping an eye on things. There's a lot on our plate with the ongoing conflict. We need to think carefully about our next moves, especially with the peace treaty discussions coming up. It's crucial we consider the long-term effects on
+
+
+Classifications:
+Hey Alice, how are you today? -- is_social
+
+
+Emotions:
+, neutral, 
+Success of Peace Treaty: False

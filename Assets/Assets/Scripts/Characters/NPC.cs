@@ -7,10 +7,8 @@ using TMPro;
 public class NPC : MonoBehaviour
 {
 
-    // private GameManager gameManager;
     [HideInInspector]
     public Emotion emotion;
-    public GameManager gameManager;
 
     [HideInInspector]
     public Culture culture;
@@ -26,24 +24,28 @@ public class NPC : MonoBehaviour
     private float maxTrust = 100;
     [HideInInspector]
     public float currentTrust = 0.5f;
-    private string lastMentalState = "Neutral";
-    private string fuzzyResponseEmotion;
-    private float neutralStateTimer = 0;
-    private float stoppedStateTimer = 0;
+    // private string lastMentalState = "Neutral";
+    // // private string fuzzyResponseEmotion;
+    // private float neutralStateTimer = 0;
+    // private float stoppedStateTimer = 0;
 
     [HideInInspector]
     public string cultureString;
     [HideInInspector]
     public string roleString = "ProPeace";
     [HideInInspector]
-    public string humorState = "neutral";
+    public string humorState;
+    [Header("NPC characteristics")]
     public string nameString;
     public Sprite npcPortrait;
+    [Header("Downsider if TRUE, Ranger if FALSE")]
     public bool DownsideXRanger = false; //Downsider if True, Ranger if False
     public bool Leader = false;
     public bool ProPeace = false;
     public bool AntiPeace = false;
     public bool personalityType = true; // Analytical-Reserved if True, Expressive-Adaptive if False
+    [SerializeField]
+    private ElementBar trustBar;
     Dictionary<string, float> cultureAttrs = new Dictionary<string, float>() {
         { "dignity", 0 },
         { "collectivism", 0 },
@@ -58,8 +60,8 @@ public class NPC : MonoBehaviour
     void Awake()
     {
         memoryCore = GetComponent<NPCMemoryCore>();
-        gameManager = FindObjectOfType<GameManager>();
         npcPortrait = transform.Find("Portrait").GetComponent<SpriteRenderer>().sprite;
+    
         // var portrait = transform.Find("Portrait");
         // if(portrait != null)
         // {
@@ -82,7 +84,30 @@ public class NPC : MonoBehaviour
 
     void Start()
     {
-        memoryCore.StartTimer();
+
+        roleString = Leader ? "Leader" : ProPeace ? "ProPeace" : AntiPeace ? "AntiPeace" : "ProPeace";
+        memoryCore.npcName = nameString;
+        
+        // StartNPC();
+        // npcPortrait = transform.Find("Portrait").GetComponent<SpriteRenderer>().sprite;
+    }
+
+    void Update()
+    {
+        if(GameManager.Instance.gameStarted == false) return;
+        
+        float dt = Time.deltaTime;
+
+        emotion?.UpdateEmotion(dt);
+
+        UpdateCurrentState();
+        cultureAttrs["trust_level"] = currentTrust;
+        humorState = emotion?.GetName();
+        trustBar?.SetValue(currentTrust);
+    }
+
+    public void StartNPC()
+    {
         Debug.Log($"[NPC] Starting NPC: {memoryCore.npcName}");
         GenerateInitialEmotion();
         // StartCoroutine(CallFuzzyModel());
@@ -91,30 +116,27 @@ public class NPC : MonoBehaviour
         prejudiceLevel = Random.Range(0f, 1f);
         humorState = emotion.GetName();
         UpdateCurrentState();
-        memoryCore.npcName = nameString;
-        roleString = Leader ? "Leader" : ProPeace ? "ProPeace" : AntiPeace ? "AntiPeace" : "ProPeace";
-        // npcPortrait = transform.Find("Portrait").GetComponent<SpriteRenderer>().sprite;
+        if(roleString == "Leader")
+        {
+            // trustBar = GameObject.Find(cultureString + "TrustBar").GetComponent<ElementBar>();
+            if (!ElementBar.Registry.TryGetValue(cultureString + "TrustBar", out trustBar))
+            {
+                Debug.LogWarning(
+                    $"TrustBar '{cultureString}TrustBar' not registered for NPC {name}"
+                );
+            }
+        }
+         else
+        {
+            trustBar = null;
+        }
+        memoryCore.playerName = GameManager.Instance.playerName;
     }
 
-
-    void Update()
+    public void EndGameNPC()
     {
-
-        float dt = Time.deltaTime;
-
-        emotion?.UpdateEmotion(dt);
-
-        UpdateCurrentState();
-
-        cultureAttrs["trust_level"] = currentTrust;
-        humorState = emotion?.GetName();
-        if (gameManager.saveGame)
-        {
-            gameManager.saveGame = false;
-            memoryCore.EndTimer();
-            gameManager.SaveGameData(memoryCore.GetSaveGameData());
-        }
-
+        GameManager.Instance.SaveGameData(memoryCore.GetSaveGameData());
+        memoryCore.Reset();
     }
 
     /// <summary>
@@ -126,6 +148,7 @@ public class NPC : MonoBehaviour
         string mentalStateName = emotion.GetMentalStateName();
         int infValue = trustInf[mentalStateName];
         currentTrust = currentTrust + infValue * prejudiceLevel * (1 / maxTrust);
+        if(trustBar != null) trustBar.SetValue(currentTrust);
     }
 
 
@@ -249,6 +272,7 @@ public class NPC : MonoBehaviour
         // StartCoroutine(CallFuzzyModel());
         UpdateCurrentState();
         UpdateTrustLevel();
+        memoryCore.SetResponseEmotion(emotion.GetName());
     }
 
 

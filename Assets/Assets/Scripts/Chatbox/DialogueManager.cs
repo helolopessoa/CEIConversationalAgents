@@ -11,9 +11,6 @@ public class DialogueManager : MonoBehaviour
 {
 
     [HideInInspector]
-    private string conversationHistory = "";
-    private string npcName = "Alice";
-    // private string allEmotionsText = "";
     private string allActionsText = "";
 
     public void Start()
@@ -26,7 +23,6 @@ public class DialogueManager : MonoBehaviour
         {
             if (!dict.ContainsKey(action)) continue;
 
-            // string action = string.Join(", ", dict[action]);
             allActionsLines.Add($"[{i}]: {action}");
             i++;
         }
@@ -37,6 +33,7 @@ public class DialogueManager : MonoBehaviour
     public string BuildDialoguePrompt(string playerMessage, NPC npc)
     {
         var npcName = npc.nameString;
+        var playerName = npc.memoryCore.playerName;
         var npcRole = npc.memoryCore.GetRole();
         var npcShortDescription = npc.memoryCore.GetShortDescription();
         var personalityText = npc.memoryCore.GetPersonalityDescription();
@@ -46,14 +43,11 @@ public class DialogueManager : MonoBehaviour
         var conversationHistory = npc.memoryCore.GetConversationHistory();
         var relationshipToPlayer = npc.memoryCore.GetRelationshipToPlayerDescription();
 
-        // var currentLocation = npc.memoryCore.GetCurrentLocationDescription();
-        // var currentSituation = npc.memoryCore.GetCurrentSituationDescription();
-        // var currentEmotionLabel = "Currently, you are feeling " + npc.emotion.GetName();
         // var currentEmotionBehaviorText = npc.memoryCore.GetBehaviorChangeDescription();
         
         
         var firstPrompt = $@"
-        SYSTEM: You are a non-playable character in a game. You respond only as the NPC, never as the game engine, narrator or the player.
+        SYSTEM: You are a non-playable character in a game. You respond only as the NPC, never as the game engine, narrator or the player ({playerName}).
         REMAIN IN CHARACTER as a non-playable character (NPC) in a game, ANSWERING ACCORDINGLY TO THE PLAYER.";
         var secondPrompt = $@"
         RULES:
@@ -66,8 +60,10 @@ public class DialogueManager : MonoBehaviour
         - DO NOT use -, | when talking, or ;.
         - Format text cleanly, no extra spaces or random newlines.
         - Answer ONLY your in-context response, no headers, nametags, NOTHING.
+        - Build your response to end WITHIN THE MAX TOKEN LIMIT!
+        - Don't produce half phrases if you reach the token limit, FINISH YOUR THOUGHT.
         GAME CONTEXT:
-        There's a war between two cultures. You belong to one of the sides. Express your concerns and opinions to the player. 
+        There's a war between two cultures. You belong to one of the sides. Express your concerns and opinions to the player ({playerName}). 
         YOUR IDENTITY IN-GAME: 
         - Name: {npcName}
         - Role: {npcRole} ";
@@ -82,11 +78,14 @@ public class DialogueManager : MonoBehaviour
         - Your personality type: {personalityText}
         - Your cultural values: {cultureText}
         - Your vision of the opposite side: {oppositeCultureText}
+        EXAMPLE OF CONVERSATION:
+        [PLAYER]: Hello {npcName}, my name is {playerName}.
+        [{npcName}]: ...Hm? Oh, hello there stranger! What brings you to this area of ours?<END>
         CONVERSATION SO FAR (SUMMARY):
         {conversationHistory}
         PLAYER LAST MESSAGE:
         {playerMessage}
-        OUTPUT FORMAT: Your response as {npcName}, in first person, in one continuous answer, to what the player said.
+        OUTPUT FORMAT: Your response as {npcName}, in first person, in one continuous answer, to what {playerName} said.
         ";
         Debug.Log("FULL DIALOGUE PROMPT: " + fullPrompt);
         return fullPrompt;
