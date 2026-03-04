@@ -16,4 +16,7 @@ __pycache__/
 *.gguf
 *.gguf.meta
 *.meta
-*/GameLogs
+/GameLogs
+/GameLogs/*
+/GameData/*
+/GameData
