@@ -59,7 +59,7 @@ public class ActionEmotions {
 
     public static List<string> GetOptionToCultureAttributes()
     {
-        return new List<string>(){ "dignity", "collectivism", "collectivism", "trust_level", "wealth", "wealth", "wealth", "wealth", "dignity", "dignity", "dignity", "politeness", "politeness" };
+        return new List<string>(){ "dignity", "collectivism", "collectivism", "dignity", "wealth", "wealth", "wealth", "wealth", "dignity", "dignity", "dignity", "politeness", "politeness" };
     }
     public static Dictionary<string, string> GetCultureAttributes() //GetCultureAttributesTalking()
     {
@@ -71,7 +71,7 @@ public class ActionEmotions {
             {"is_threatening", "dignity" },
             {"is_intimidating", "collectivism" },
             {"is_hostile", "collectivism" },
-            {"is_accusing", "trust_level" }, //this will probably change
+            {"is_accusing", "dignity" }, //this will probably change
 
             {"is_offering","wealth"},
             {"is_accusing_theft","wealth" },
@@ -85,6 +85,10 @@ public class ActionEmotions {
             
         };
     }
+
+
+
+
 
 
     // public static Dictionary<string, string> GetCultureAttributes()

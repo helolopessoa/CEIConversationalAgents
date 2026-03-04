@@ -1,4 +1,5 @@
 using System.Collections;
+using Microsoft.VisualBasic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;  
@@ -26,8 +27,7 @@ public class ChatController : MonoBehaviour
     public PlayerController2D player;      // assign in inspector (or auto-find)
 
     private bool chatOpen = false;
-
-void Awake()
+    void Awake()
     {
         npc = this.GetComponent<NPC>();
         var chatUIMap = chatInputAsset.FindActionMap("ChatboxUI", true);
@@ -133,16 +133,16 @@ void Awake()
 
     }
 
-    private IEnumerator CallModelClassification(string prompt, string playerMessage)
+    private IEnumerator CallModelClassification(string prompt, string playerMessage = null)
     {
         // Debug.Log("[ChatController] CallModelClassification(prompt, playerMessage) called.");
         ModelClassificationResponse lr = null;
+        string dialoguePrompt = "";
         yield return ModelAPI.PostModelActionClassification(prompt, (resp) => lr = resp);
 
         if (lr == null)
         {
-            npcMessage = "[Error] Model failure.";
-            // chatLog?.UpdateNpcMessage();
+            npcMessage = "[Error] Classification Model failure.";
             yield break;
         }
         else
@@ -150,12 +150,39 @@ void Awake()
             Debug.Log("[ChatController] Classification response received.");
             Debug.Log(lr.result);
         }
-        npc.DispatchPlayerState(lr.result);
-
-        Debug.Log("[ChatController] Dispatching player state: " + lr.result);
-        npc.memoryCore.SetClassification(playerMessage, lr.result);
-        string dialoguePrompt = dm.BuildDialoguePrompt(playerMessage, npc);
-        StartCoroutine(CallModelAndShowReply(dialoguePrompt, playerMessage));
+        if(playerMessage != null)
+        {
+            npc.DispatchPlayerState(lr.result);
+            Debug.Log("[ChatController] Dispatching player state: " + lr.result);
+            npc.memoryCore.SetClassification(playerMessage, lr.result);{
+                if (GameManager.baselineTest)
+                {
+                    dialoguePrompt = dm.BuildBaselineDialoguePrompt(playerMessage, npc);
+                }
+                else
+                {
+                    dialoguePrompt = dm.BuildDialoguePrompt(playerMessage, npc);                    
+                }
+            StartCoroutine(CallModelAndShowReply(dialoguePrompt, playerMessage));}
+        }
+        else
+        {
+            bool decision;
+            if(npc.memoryCore.npcRole == "Downsides") 
+            {
+                bool.TryParse(lr.result.ToLower(), out decision);
+                GameManager.SetDownsidePeaceTreatyResult(decision);
+                npc.memoryCore.SetNPCDecision(decision);
+            }
+            else if(npc.memoryCore.npcRole == "Rangers") 
+            {
+                bool.TryParse(lr.result.ToLower(), out decision);
+                GameManager.SetRangersPeaceTreatyResult(decision);
+                // GameManager.Instance.successOnPeaceTreatyRangers.Value = decision;
+                npc.memoryCore.SetNPCDecision(decision);
+            }
+            // if(GameManager.Instance.successOnPeaceTreaty != null) npc.memoryCore.SetGameResult(GameManager.Instance.successOnPeaceTreaty);
+        }
     }
 
         private IEnumerator CallModelAndShowReply(string prompt, string playerMessage)
@@ -166,15 +193,20 @@ void Awake()
 
         if (lr == null)
         {
-            npcMessage = "[Error] Model failure.";
+            npcMessage = "[Error] Answer Model failure.";
             chatLog?.UpdateNpcMessage();
             yield break;
         }
         npcMessage = dm.GetNpcTextMessage(lr);
         npc.memoryCore.SetConversationHistory(playerMessage, npcMessage);
         chatLog?.UpdateNpcMessage();
+        
+        if(npc.currentTrust >= 0.8f && npc.memoryCore.npcRole == "Leader")
+        {
+            var resultPrompt = dm.BuildResultPrompt(npcMessage);
+            StartCoroutine(CallModelClassification(resultPrompt));
+        }
     }
-
 }
 
 

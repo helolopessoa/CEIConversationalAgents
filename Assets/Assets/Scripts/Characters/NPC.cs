@@ -23,7 +23,7 @@ public class NPC : MonoBehaviour
 
     private float maxTrust = 100;
     [HideInInspector]
-    public float currentTrust = 0.5f;
+    public float currentTrust = 0f;
     // private string lastMentalState = "Neutral";
     // // private string fuzzyResponseEmotion;
     // private float neutralStateTimer = 0;
@@ -47,12 +47,12 @@ public class NPC : MonoBehaviour
     [SerializeField]
     private ElementBar trustBar;
     Dictionary<string, float> cultureAttrs = new Dictionary<string, float>() {
+        { "time", 0 },
         { "dignity", 0 },
         { "collectivism", 0 },
         { "wealth", 0 },
         { "politeness", 0 },
         { "rationatity", 0 },
-        { "trust_level", 0 },
     };
 
     float[] emotionBands = new float[4] { 0, 0.2f, 0.5f, 0.7f };
@@ -94,16 +94,20 @@ public class NPC : MonoBehaviour
 
     void Update()
     {
-        if(GameManager.Instance.gameStarted == false) return;
-        
-        float dt = Time.deltaTime;
+        if(!GameManager.gameStarted) return;
+        // Debug.Log("GameManager.gameStarted");
+        // Debug.Log(GameManager.gameStarted);
+        // else
+        // {
+            float dt = Time.deltaTime;
 
-        emotion?.UpdateEmotion(dt);
+            emotion?.UpdateEmotion(dt);
 
-        UpdateCurrentState();
-        cultureAttrs["trust_level"] = currentTrust;
-        humorState = emotion?.GetName();
-        trustBar?.SetValue(currentTrust);
+            UpdateCurrentState();
+            // cultureAttrs["trust_level"] = currentTrust;
+            humorState = emotion?.GetName();
+            trustBar?.SetValue(currentTrust);   
+        // }
     }
 
     public void StartNPC()
@@ -113,7 +117,8 @@ public class NPC : MonoBehaviour
         // StartCoroutine(CallFuzzyModel());
         GenerateInitialPersonality();
         GenerateInitialCulture();
-        prejudiceLevel = Random.Range(0f, 1f);
+        // prejudiceLevel = Random.Range(0f, 1f); --> difficulty level
+        prejudiceLevel = 0.1f;
         humorState = emotion.GetName();
         UpdateCurrentState();
         if(roleString == "Leader")
@@ -142,11 +147,12 @@ public class NPC : MonoBehaviour
     /// <summary>
     /// Updates the trust level value.
     /// </summary>
-    void UpdateTrustLevel()
+    void UpdateTrustLevel(string culturalValueAttribute)
     {
-        Dictionary<string, int> trustInf = AllEmotions.GetTrustInfluence();
-        string mentalStateName = emotion.GetMentalStateName();
-        int infValue = trustInf[mentalStateName];
+        // Dictionary<string, int> trustInf = AllEmotions.GetTrustInfluence();
+        // string mentalStateName = emotion.GetMentalStateName();
+        float culturalValue = culture.GetValueThroughKey(culturalValueAttribute);
+        int infValue = culturalValue >= 0.5f ? infValue = 1 : infValue = -1;
         currentTrust = currentTrust + infValue * prejudiceLevel * (1 / maxTrust);
         if(trustBar != null) trustBar.SetValue(currentTrust);
     }
@@ -206,6 +212,7 @@ public class NPC : MonoBehaviour
     /// </summary>
     void UpdateCurrentState()
     {
+        if(emotion == null) return;
         Dictionary<string, int> trustInf = AllEmotions.GetTrustInfluence();
         string mentalStateName = emotion.GetMentalStateName();
         // string mentalStateName = emotion.GetMentalStateName(fuzzyResponseEmotion);
@@ -239,14 +246,14 @@ public class NPC : MonoBehaviour
                 resEmotion = emotionsArray[i];
             }
         }
-        UpdateEmotionByEvent(allEmo[resEmotion]);
+        UpdateEmotionByEvent(allEmo[resEmotion], attrName);
     }
 
     /// <summary>
     /// Updates the emotion by event.
     /// </summary>
     /// <param name="eventEmotion">Event emotion.</param>
-    void UpdateEmotionByEvent(float[] eventEmotion)
+    void UpdateEmotionByEvent(float[] eventEmotion, string attrValue)
     {
         float[] newEmotion = new float[4];
         float[] p = personality.GetPersonality();
@@ -271,7 +278,7 @@ public class NPC : MonoBehaviour
         emotion.ClampCurrentEmotion();
         // StartCoroutine(CallFuzzyModel());
         UpdateCurrentState();
-        UpdateTrustLevel();
+        UpdateTrustLevel(attrValue);
         memoryCore.SetResponseEmotion(emotion.GetName());
     }
 

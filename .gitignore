@@ -15,3 +15,5 @@ __pycache__/
 *.pyc
 *.gguf
 *.gguf.meta
+*.meta
+*/GameLogs

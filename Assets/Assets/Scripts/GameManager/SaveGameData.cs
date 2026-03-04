@@ -11,9 +11,11 @@ public class SaveGameData
     public string npcCulture;
     public string npcPersonality;
     public string chatSummary;
+    public string fedConversationHistory;
     public List<string> emotions = new List<string>();
     public List<string> classifications = new List<string>();
-    public bool peaceTreatySigned = true;
+    public bool? npcPeaceTreatySigned;
+    public bool? peaceTreatySigned;
     public float playTime;
 
 }

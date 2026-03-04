@@ -4,10 +4,12 @@ using System.IO;
 
 public class SaveGameChat : MonoBehaviour
 {
+    private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData";
     public static void SaveGameData(SaveGameData data)
     {
         Debug.Log("[SaveGameChat] Endgame called. Saving chat logs.");
-        string folderPath = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameLogs";
+        string folderPath = path + "/GameLogs/Baseline" + data.npcName;
+        // string folderPath = path + "/GameLogs/Scaffolded" + data.npcName;
         Directory.CreateDirectory(folderPath);
 
         string fileName = "GAME_RESUME_" + data.npcName + "_" + data.npcRoleTitle + "_" + data.npcCulture + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".txt";
@@ -45,8 +47,45 @@ public class SaveGameChat : MonoBehaviour
 
         File.WriteAllText(fullPath, sb.ToString());
         Debug.Log("Saved game data at: " + fullPath);
-}
+    }
+
+    // public static void SaveGameChatFEDsData(SaveGameData data)
+    // {
+    //     Debug.Log("[SaveGameChat] Endgame called. Saving chat logs.");
+    //     string folderPath = path + "/GameLogs/FED/Baseline";
+    //     // string folderPath = path + "/GameLogs/FED/Scaffolded";
+    //     Directory.CreateDirectory(folderPath);
+
+    //     string fileName = "FED_RESUME_" + data.npcName + "_" + data.npcRoleTitle + "_" + data.npcCulture + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".txt";
+    //     string fullPath = Path.Combine(folderPath, fileName);
+
+    //     StringBuilder sb = new StringBuilder();
+    //     sb.AppendLine(data.fedConversationHistory);
+
+    //     File.WriteAllText(fullPath, sb.ToString());
+    //     Debug.Log("Saved game data at: " + fullPath);
+    // }
+
+        public static void SaveGameChatData(SaveGameData data)
+    {
+        Debug.Log("[SaveGameChat] Endgame called. Saving chat logs.");
+        string folderPath = path + "/GameLogs/ConversationsSummary/Baseline";
+        // string folderPath = path + "/GameLogs/ConversationsSummary/Scaffoldeds";
+        Directory.CreateDirectory(folderPath);
+
+        string fileName = "CONVERSATION_RESUME_" + data.npcName + "_" + data.npcRoleTitle + "_" + data.npcCulture + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".txt";
+        string fullPath = Path.Combine(folderPath, fileName);
+
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine(data.chatSummary);
+        // foreach (var classification in data.classifications)
+        // {
+        //     sb.AppendLine(classification);
+        // }
+
+        File.WriteAllText(fullPath, sb.ToString());
+        Debug.Log("Saved game data at: " + fullPath);
+    }
 
 
-    
 }
