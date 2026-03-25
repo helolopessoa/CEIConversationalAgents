@@ -59,7 +59,7 @@ public class DialogueManager : MonoBehaviour
         - DO NOT use -, | when talking, or ;.
         - Format text cleanly, no extra spaces or random newlines.
         - Answer ONLY your in-context response, no headers, nametags, NOTHING.
-        - Keep your response limited to around 40 words.
+        - Keep your response limited to 40 words, less is alright, more is unwelcomed.
         - Don't produce half phrases if you reach the token limit, FINISH YOUR THOUGHT.
         GAME CONTEXT:
         There's a war between two cultures. You're part of the {npc.cultureString}. Express your concerns and opinions to the player ({playerName}). 
@@ -86,7 +86,7 @@ public class DialogueManager : MonoBehaviour
         {playerMessage}
         OUTPUT FORMAT: Your response as {npcName}, in first person, in one continuous answer, to what {playerName} said.
         ";
-        Debug.Log("FULL DIALOGUE PROMPT: " + fullPrompt);
+        Debug.Log("FULL SCAFFOLD DIALOGUE PROMPT: " + fullPrompt);
         return fullPrompt;
     }
 
@@ -97,16 +97,9 @@ public class DialogueManager : MonoBehaviour
         var playerName = npc.memoryCore.playerName;
         var npcRole = npc.memoryCore.GetRole();
         var npcShortDescription = npc.memoryCore.GetShortDescription();
-        var personalityText = npc.memoryCore.GetPersonalityDescription();
-        var cultureText = npc.memoryCore.GetCultureDescription();
         var fellowFolkText = npc.memoryCore.GetFellowsDescription();
-        var oppositeCultureText = npc.memoryCore.GetOppositeCultureDescription();
-        var behaviorPatternsText = npc.memoryCore.GetBehaviorPatternsDescription();
         var conversationHistory = npc.memoryCore.GetConversationHistory();
-        var relationshipToPlayer = npc.memoryCore.GetRelationshipToPlayerDescription();
-
-        // var currentEmotionBehaviorText = npc.memoryCore.GetBehaviorChangeDescription();
-        
+        var relationshipToPlayer = npc.memoryCore.GetRelationshipToPlayerDescription();        
         
         var firstPrompt = $@"
         SYSTEM: You are a non-playable character in a game. You respond only as the NPC, never as the game engine, narrator or the player ({playerName}).
@@ -122,7 +115,7 @@ public class DialogueManager : MonoBehaviour
         - DO NOT use -, | when talking, or ;.
         - Format text cleanly, no extra spaces or random newlines.
         - Answer ONLY your in-context response, no headers, nametags, NOTHING.
-        - Keep your response limited to around 40 words.
+        - Keep your response limited to 40 words, less is alright, more is unwelcomed.
         - Don't produce half phrases if you reach the token limit, FINISH YOUR THOUGHT.
         GAME CONTEXT:
         There's a war between two cultures. You belong to one of the sides. Express your concerns and opinions to the player ({playerName}). 
@@ -146,7 +139,7 @@ public class DialogueManager : MonoBehaviour
         {playerMessage}
         OUTPUT FORMAT: Your response as {npcName}, in first person, in one continuous answer, to what {playerName} said.
         ";
-        Debug.Log("FULL DIALOGUE PROMPT: " + fullPrompt);
+        Debug.Log("FULL BASELINE DIALOGUE PROMPT: " + fullPrompt);
         return fullPrompt;
     }
 

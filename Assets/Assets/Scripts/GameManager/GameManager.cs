@@ -8,9 +8,12 @@ public class GameManager : MonoBehaviour
     
     public static GameManager Instance { get; private set; }
     public static bool gameStarted {get; private set; }
-    public static float initialTimer  {get; private set; } = 600f; //180f
-    public static float timeRemaining  {get; private set; } = 600f; //180f
-    public static bool baselineTest = false;
+    public static float initialTimer  {get; private set; } = 60000f; //180f
+    public static float timeRemaining  {get; private set; } = 60000f; //180f
+
+    [Header("Data testing settings")]
+    public static bool baselineTest = true;
+    
     // public static bool timerIsRunning  {get; private set; } = false;
     
     [Header("UI")]
@@ -192,8 +195,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Game data saved for NPC: " + data.npcName);
         Debug.Log("Game data saved: " + data);
         data.peaceTreatySigned = successOnPeaceTreaty;
-        SaveGameChat.SaveGameData(data);
-        SaveGameChat.SaveGameChatData(data);
+        SaveGameChat.SaveGameData(data, baselineTest);
     }
 
     public static void SetRangersPeaceTreatyResult(bool? result) => GameManager.Instance.successOnPeaceTreatyRangers = result; 

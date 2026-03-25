@@ -135,7 +135,8 @@ public class ChatController : MonoBehaviour
 
     private IEnumerator CallModelClassification(string prompt, string playerMessage = null)
     {
-        // Debug.Log("[ChatController] CallModelClassification(prompt, playerMessage) called.");
+        Debug.Log("[ChatController] CallModelClassification(prompt, playerMessage) called.");
+        Debug.Log("[ChatController] playerMessage = " + playerMessage);
         ModelClassificationResponse lr = null;
         string dialoguePrompt = "";
         yield return ModelAPI.PostModelActionClassification(prompt, (resp) => lr = resp);
@@ -155,19 +156,20 @@ public class ChatController : MonoBehaviour
             npc.DispatchPlayerState(lr.result);
             Debug.Log("[ChatController] Dispatching player state: " + lr.result);
             npc.memoryCore.SetClassification(playerMessage, lr.result);{
-                if (GameManager.baselineTest)
-                {
-                    dialoguePrompt = dm.BuildBaselineDialoguePrompt(playerMessage, npc);
-                }
-                else
-                {
-                    dialoguePrompt = dm.BuildDialoguePrompt(playerMessage, npc);                    
-                }
+            Debug.Log("[ChatController] Game testing base: " + GameManager.baselineTest);
+            if (GameManager.baselineTest)
+            {
+                dialoguePrompt = dm.BuildBaselineDialoguePrompt(playerMessage, npc);
+            }
+            else
+            {
+                dialoguePrompt = dm.BuildDialoguePrompt(playerMessage, npc);                    
+            }
             StartCoroutine(CallModelAndShowReply(dialoguePrompt, playerMessage));}
         }
         else
         {
-            bool decision;
+            bool decision = false;
             if(npc.memoryCore.npcRole == "Downsides") 
             {
                 bool.TryParse(lr.result.ToLower(), out decision);
@@ -181,6 +183,7 @@ public class ChatController : MonoBehaviour
                 // GameManager.Instance.successOnPeaceTreatyRangers.Value = decision;
                 npc.memoryCore.SetNPCDecision(decision);
             }
+            Debug.Log("[ChatController] Peace Treaty Result = " + decision);
             // if(GameManager.Instance.successOnPeaceTreaty != null) npc.memoryCore.SetGameResult(GameManager.Instance.successOnPeaceTreaty);
         }
     }
@@ -199,6 +202,7 @@ public class ChatController : MonoBehaviour
         }
         npcMessage = dm.GetNpcTextMessage(lr);
         npc.memoryCore.SetConversationHistory(playerMessage, npcMessage);
+        npc.memoryCore.SetNPCConversationHistory(npcMessage);
         chatLog?.UpdateNpcMessage();
         
         if(npc.currentTrust >= 0.8f && npc.memoryCore.npcRole == "Leader")

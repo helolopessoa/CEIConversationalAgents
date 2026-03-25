@@ -11,7 +11,7 @@ public class SaveGameData
     public string npcCulture;
     public string npcPersonality;
     public string chatSummary;
-    public string fedConversationHistory;
+    public string npcMessageHistory;
     public List<string> emotions = new List<string>();
     public List<string> classifications = new List<string>();
     public bool? npcPeaceTreatySigned;

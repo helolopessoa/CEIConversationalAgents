@@ -4,16 +4,29 @@ using System.IO;
 
 public class SaveGameChat : MonoBehaviour
 {
-    private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData";
-    public static void SaveGameData(SaveGameData data)
+    // private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData" + "/LLMAsPlayer";
+        // private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData" + "/Scripts/NeutralInquiry";
+    // private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData" + "/Scripts/Provocation";
+    // private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData" + "/Scripts/CulturalMisunderstanding";
+    private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData" + "/Scripts/Negotiation";
+    // private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData" + "/Scripts/CulturalProbes";
+
+    public static void SaveGameData(SaveGameData data, bool baselineTests)
     {
         Debug.Log("[SaveGameChat] Endgame called. Saving chat logs.");
-        string folderPath = path + "/GameLogs/Baseline" + data.npcName;
-        // string folderPath = path + "/GameLogs/Scaffolded" + data.npcName;
-        Directory.CreateDirectory(folderPath);
+        string folderPath = "";
+        if (baselineTests)
+        {
+            folderPath = path +"/Baseline/" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        }
+        else
+        {
+            folderPath = path  +"/Scaffold/" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss");           
+        }
+        Directory.CreateDirectory(folderPath + "/GameLogs");
 
-        string fileName = "GAME_RESUME_" + data.npcName + "_" + data.npcRoleTitle + "_" + data.npcCulture + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".txt";
-        string fullPath = Path.Combine(folderPath, fileName);
+        string fileName = "GAME_RESUME_" + data.npcName + "_" + data.npcRoleTitle + "_" + data.npcCulture + "_" + ".txt";
+        string fullPath = Path.Combine(folderPath  + "/GameLogs", fileName);
 
         StringBuilder sb = new StringBuilder();
 
@@ -28,7 +41,7 @@ public class SaveGameChat : MonoBehaviour
         sb.AppendLine("NPC Role: " + data.npcRoleTitle);
         sb.AppendLine("NPC Cuture: " + data.npcCulture);
         sb.AppendLine("NPC Personality Type: " + data.npcPersonality);
-        sb.AppendLine("Conversation: " + data.chatSummary);
+        sb.AppendLine("Conversation: \n" + data.chatSummary);
         
         sb.AppendLine("\n");
         
@@ -47,6 +60,8 @@ public class SaveGameChat : MonoBehaviour
 
         File.WriteAllText(fullPath, sb.ToString());
         Debug.Log("Saved game data at: " + fullPath);
+        SaveGameChatData(data, baselineTests, folderPath);
+        SaveNPCGameChatData(data, baselineTests, folderPath);
     }
 
     // public static void SaveGameChatFEDsData(SaveGameData data)
@@ -66,14 +81,12 @@ public class SaveGameChat : MonoBehaviour
     //     Debug.Log("Saved game data at: " + fullPath);
     // }
 
-        public static void SaveGameChatData(SaveGameData data)
+    private static void SaveGameChatData(SaveGameData data, bool baselineTests, string folderPath)
     {
-        Debug.Log("[SaveGameChat] Endgame called. Saving chat logs.");
-        string folderPath = path + "/GameLogs/ConversationsSummary/Baseline";
-        // string folderPath = path + "/GameLogs/ConversationsSummary/Scaffoldeds";
+        folderPath += "/ConversationResume";
         Directory.CreateDirectory(folderPath);
 
-        string fileName = "CONVERSATION_RESUME_" + data.npcName + "_" + data.npcRoleTitle + "_" + data.npcCulture + "_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".txt";
+        string fileName = "CONVERSATION_RESUME_" + data.npcName + "_" + data.npcRoleTitle + "_" + data.npcCulture + ".txt";
         string fullPath = Path.Combine(folderPath, fileName);
 
         StringBuilder sb = new StringBuilder();
@@ -86,6 +99,25 @@ public class SaveGameChat : MonoBehaviour
         File.WriteAllText(fullPath, sb.ToString());
         Debug.Log("Saved game data at: " + fullPath);
     }
+
+    private static void SaveNPCGameChatData(SaveGameData data, bool baselineTests, string folderPath)
+    {
+        folderPath += "/NPCResume";
+        Directory.CreateDirectory(folderPath);
+
+        string fileName = "NPC_RESUME_" + data.npcName + "_" + data.npcRoleTitle + "_" + data.npcCulture + ".txt";
+        string fullPath = Path.Combine(folderPath, fileName);
+
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine(data.npcMessageHistory);
+        // foreach (var classification in data.classifications)
+        // {
+        //     sb.AppendLine(classification);
+        // }
+
+        File.WriteAllText(fullPath, sb.ToString());
+        Debug.Log("Saved game data at: " + fullPath);
+    }    
 
 
 }

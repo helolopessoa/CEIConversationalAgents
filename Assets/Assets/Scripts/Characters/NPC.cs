@@ -152,8 +152,10 @@ public class NPC : MonoBehaviour
         // Dictionary<string, int> trustInf = AllEmotions.GetTrustInfluence();
         // string mentalStateName = emotion.GetMentalStateName();
         float culturalValue = culture.GetValueThroughKey(culturalValueAttribute);
-        int infValue = culturalValue >= 0.5f ? infValue = 1 : infValue = -1;
-        currentTrust = currentTrust + infValue * prejudiceLevel * (1 / maxTrust);
+        int infValue = culturalValue >= 0.5f ? 1 : -1;
+        // currentTrust = currentTrust + infValue * prejudiceLevel * (1 / maxTrust);
+        currentTrust = currentTrust + infValue * prejudiceLevel * 0.5f;
+        currentTrust = Mathf.Clamp01(currentTrust); //try
         if(trustBar != null) trustBar.SetValue(currentTrust);
     }
 

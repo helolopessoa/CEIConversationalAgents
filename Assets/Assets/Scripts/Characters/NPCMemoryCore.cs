@@ -26,7 +26,7 @@ public class NPCMemoryCore : MonoBehaviour
     [HideInInspector]
     public string npcMessage;
     private string conversationHistory;
-    private string fedConversationHistory;
+    private string npcMessageHistory;
     private NPC npc;
     private SaveGameData saveGameData;
 
@@ -46,11 +46,13 @@ public class NPCMemoryCore : MonoBehaviour
         };
         npcMessage = greetings[Random.Range(0, greetings.Length)];
         conversationHistory = "";
-        // fedConversationHistory = "";
-        saveGameData = new SaveGameData();
-        saveGameData.npcName = npcName;
-        saveGameData.npcRoleTitle = npc.roleString;
-        saveGameData.playTime = Time.time;
+        npcMessageHistory = "";
+        saveGameData = new SaveGameData
+        {
+            npcName = npcName,
+            npcRoleTitle = npc.roleString,
+            playTime = Time.time
+        };
     }
 
     public string GetRole() => NPCRole.GetRolesDict()[npc.roleString]; //--> fixed value
@@ -77,8 +79,8 @@ public class NPCMemoryCore : MonoBehaviour
     public string GetCurrentSituationDescription() => currentSituation; //--> alters with conversation history
     public string GetRelationshipToPlayerDescription() => @$"Trust towards {playerName} is: "+ npc.currentTrust.ToString(CultureInfo.InvariantCulture) + "/ 1.0"; //--> alters with conversation history
     public string GetConversationHistory() => conversationHistory; //--> alters with conversation history
-    public string SetConversationHistory(string playerMessage, string npcMessage) => conversationHistory += playerMessage + $"\n" + npcMessage; //--> alters with conversation history
-    // public string SetConversationHistory(string playerMessage, string npcMessage) => conversationHistory += "\n[PLAYER] " + playerMessage + $"\n[{npcName}] " + npcMessage; //--> alters with conversation history
+    public string SetConversationHistory(string playerMessage, string npcMessage) => conversationHistory += playerMessage + "\n" + npcMessage + "\n"; //--> alters with conversation history
+    public string SetNPCConversationHistory(string npcMessage) => npcMessageHistory += npcMessage + "\n"; //--> alters with conversation history
     // public string SetFEDConversationHistory(string playerMessage, string npcMessage) => fedConversationHistory += $"<|endoftext|> {playerMessage}\n <|endoftext|> {npcMessage}"; //--> alters with conversation history
     public void SetClassification(string newMessage, string classification) => saveGameData.classifications.Add(@$"{newMessage} -- {classification}"); //--> alters with conversation history
     public void SetResponseEmotion(string emotion) => saveGameData.emotions.Add(emotion); //--> alters with conversation history
@@ -93,9 +95,9 @@ public class NPCMemoryCore : MonoBehaviour
         saveGameData.npcRoleTitle = npc.roleString;
         saveGameData.npcCulture = npc.cultureString;
         saveGameData.npcPersonality = npc.personalityType.ToString();
-        saveGameData.npcPersonality+= npc.personalityType ? " - Analytical–Reserved" : " - Expressive–Adaptive";
-        // saveGameData.fedConversationHistory = fedConversationHistory;
-        saveGameData.chatSummary = fedConversationHistory;
+        saveGameData.npcPersonality += npc.personalityType ? " - Analytical–Reserved" : " - Expressive–Adaptive";
+        saveGameData.npcMessageHistory = npcMessageHistory;
+        saveGameData.chatSummary = conversationHistory;
         saveGameData.playTime = Time.time - saveGameData.playTime;
         return saveGameData;
     }

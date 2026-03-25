@@ -117,8 +117,8 @@ public class Culture {
     {
         // VisionFromDownsider -> A Downsider's POV of Ranger culture, and vice-versa
         return new Dictionary<string, string>() {
-            { "Ranger", "Roxanne is the leader. Yasmin is the woman civillian in favor of the peace treaty to be signed, and the war to end. Ursula is the other Ranger, she's against the peace"},
-            { "Downside", "Alice is the leader. Lorelai is the woman civillian in favor of the peace treaty to be signed, and the war to end. Tiana is the other Downside, she's against the peace"},
+            { "Ranger", "Roxanne is the leader of the Rangers, that are in war with the Downsides. Yasmin is the woman civillian in favor of the peace treaty to be signed, and the war to end. Ursula is the other Ranger, she's against the peace"},
+            { "Downside", "Alice is the leader of the Downsides, that are in war with the Rangers. Lorelai is the woman civillian in favor of the peace treaty to be signed, and the war to end. Tiana is the other Downside, she's against the peace"},
         };
     }
 
