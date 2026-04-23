@@ -90,7 +90,7 @@ public class Culture {
         return new Dictionary<string, float[]>() {
             { "Ogre", new float[6] { 0.15f, 0.63f, 0.31f, 0.02f, 0.15f, 0.93f } },
             { "Traveller", new float[6] { 0.28f, 0.25f, 0.82f, 0.75f, 0.93f, 0.43f} },
-            { "Ranger", new float[6] { 0.72f, 0.456f, 0.88f, 0.73f, 0.76f, 1f } },
+            { "Ranger", new float[6] { 0.72f, 0.56f, 0.88f, 0.73f, 0.76f, 1f } },
             { "Adventurer", new float[6] { 0.83f, 0.24f, 0.65f, 0.58f, 0.25f, 0.77f} },
             { "Downside", new float[6] { 0.05f, 1f, 0.02f, 0.15f, 0.39f, 0.22f} },
         };

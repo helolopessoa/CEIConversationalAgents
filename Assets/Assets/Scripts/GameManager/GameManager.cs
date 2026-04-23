@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     public static float timeRemaining  {get; private set; } = 60000f; //180f
 
     [Header("Data testing settings")]
-    public static bool baselineTest = true;
+    public static bool baselineTest = true; //if true, baseline on, if off, scaffold on
     
     // public static bool timerIsRunning  {get; private set; } = false;
     
@@ -34,6 +34,8 @@ public class GameManager : MonoBehaviour
     private bool timerEnded;
     [SerializeField] private TMP_Text endgameMessageOutput;
     public string playerName = "";
+    // public VSMtest vsmtest;
+
 
     void Awake()
     {
@@ -108,6 +110,7 @@ public class GameManager : MonoBehaviour
         gameStarted = true;
         player.ResumeMovement();
         Debug.Log("[GameManager] StartGame called. Variable gameStarted: " + gameStarted);
+
     }
     public void RestartGame()
     {
@@ -202,7 +205,7 @@ public class GameManager : MonoBehaviour
     public static void SetDownsidePeaceTreatyResult(bool? result) => GameManager.Instance.successOnPeaceTreatyDownsides = result; 
     
 
-    void StartNPCs()
+    public void StartNPCs()
     {
         foreach (var npc in npcs)
         {
@@ -210,7 +213,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void EndGameNPCs()
+    public void EndGameNPCs()
     {
         foreach (var npc in npcs)
         {

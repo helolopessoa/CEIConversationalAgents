@@ -81,8 +81,6 @@ public class ActionEmotions {
             {"is_social", "dignity" },
             {"is_personal", "dignity" },
             {"is_intimate", "dignity" },
-
-            
         };
     }
 

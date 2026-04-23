@@ -8,11 +8,13 @@ public class SaveGameChat : MonoBehaviour
         // private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData" + "/Scripts/NeutralInquiry";
     // private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData" + "/Scripts/Provocation";
     // private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData" + "/Scripts/CulturalMisunderstanding";
-    private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData" + "/Scripts/Negotiation";
+    private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData" + "/Scripts/VSMTest";
+    // private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData" + "/Scripts/Negotiation";
     // private static string path = "C:/Users/helopessoa/Documents/Mestrado/CEIConversationalAgents/Assets/Assets/GameData" + "/Scripts/CulturalProbes";
 
     public static void SaveGameData(SaveGameData data, bool baselineTests)
     {
+        if (string.IsNullOrWhiteSpace(data.chatSummary)) return;
         Debug.Log("[SaveGameChat] Endgame called. Saving chat logs.");
         string folderPath = "";
         if (baselineTests)

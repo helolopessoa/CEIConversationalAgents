@@ -9,7 +9,6 @@ using UnityEngine.EventSystems;
 public class DialogueManager : MonoBehaviour
 {
 
-    [HideInInspector]
     private string allActionsText = "";
 
     public void Start()
@@ -26,7 +25,7 @@ public class DialogueManager : MonoBehaviour
             i++;
         }
         allActionsText = string.Join("\n", allActionsLines);
-        // Debug.Log("ALL EMOTIONS TEXT: " + allEmotionsText);
+        Debug.Log("ALL EMOTIONS TEXT: " + allActionsText);
     }
 
     public string BuildDialoguePrompt(string playerMessage, NPC npc)

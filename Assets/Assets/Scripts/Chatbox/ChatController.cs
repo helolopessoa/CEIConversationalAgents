@@ -27,11 +27,13 @@ public class ChatController : MonoBehaviour
     public PlayerController2D player;      // assign in inspector (or auto-find)
 
     private bool chatOpen = false;
+    public string npcName = "";
     void Awake()
     {
         npc = this.GetComponent<NPC>();
         var chatUIMap = chatInputAsset.FindActionMap("ChatboxUI", true);
         sendChatAction = chatUIMap.FindAction("SendMessage", true);
+        npcName = npc.nameString;
         // npcMessage = npc.memoryCore.npcMessage;
     }
 
@@ -86,7 +88,7 @@ public class ChatController : MonoBehaviour
         }
     }
 
-        private void OnSendChat(InputAction.CallbackContext ctx)
+    private void OnSendChat(InputAction.CallbackContext ctx)
     {
         if (!ctx.performed) return;
         if (player != null && player.canMove == true) return;          // não está com chat aberto
@@ -100,6 +102,7 @@ public class ChatController : MonoBehaviour
 
         chatOpen = true;
         if (chatUI != null)
+            Debug.Log("[ChatController] Opening chat: " + npcName);
             chatUI.SetActive(true);
             ChangeCanvasPortrait();
             chatLog.Init(this);
@@ -116,6 +119,7 @@ public class ChatController : MonoBehaviour
         if (!chatOpen) return;
         chatOpen = false;
         if (chatUI != null)
+            Debug.Log("[ChatController] Closing chat: " + npcName);
             chatUI.SetActive(false);
     }
 
@@ -132,6 +136,7 @@ public class ChatController : MonoBehaviour
         StartCoroutine(CallModelClassification(classificationPrompt, playerMessage));
 
     }
+
 
     private IEnumerator CallModelClassification(string prompt, string playerMessage = null)
     {
